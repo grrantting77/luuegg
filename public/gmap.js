@@ -17,7 +17,7 @@ function pinLayerClass() {
         if (p) { it.el.style.left = p.x + 'px'; it.el.style.top = p.y + 'px'; }
       }
     }
-    set(items) { this.div.replaceChildren(...items.map(i => i.el)); this.items = items; this.draw(); }
+    setItems(items) { this.div.replaceChildren(...items.map(i => i.el)); this.items = items; this.draw(); }
   };
   return PinLayerClass;
 }
@@ -118,7 +118,7 @@ class GMap {
   setPins(pins) { this.pins = pins; if (this.ready) this._drawPins(); }
   _drawPins() {
     const sorted = this.pins.slice().sort((a, b) => b.lat - a.lat);
-    this.layer.set(sorted.map(d => ({ lat: d.lat, lng: d.lng, el: this._pinEl(d) })));
+    this.layer.setItems(sorted.map(d => ({ lat: d.lat, lng: d.lng, el: this._pinEl(d) })));
   }
   setRoutes(routes) { this.routes = routes; if (this.ready) this._drawRoutes(); }
   _drawRoutes() {
@@ -147,9 +147,9 @@ class GMap {
   }
   setPick(lng, lat) { this.pickPt = lng == null ? null : [lng, lat]; if (this.ready) this._drawPick(); }
   _drawPick() {
-    if (!this.pickPt) return this.pickLayer.set([]);
+    if (!this.pickPt) return this.pickLayer.setItems([]);
     const el = document.createElement('div'); el.className = 'gpin pick'; el.innerHTML = GPIN_SVG('#F2B632');
-    this.pickLayer.set([{ lng: this.pickPt[0], lat: this.pickPt[1], el }]);
+    this.pickLayer.setItems([{ lng: this.pickPt[0], lat: this.pickPt[1], el }]);
   }
   flyTo([lng, lat], k = 600, animate = true) {
     if (!this.map) return;

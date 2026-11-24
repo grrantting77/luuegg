@@ -1,0 +1,2496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>噜包蛋之城</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a hand-drawn notebook town. Paper background, ink outlines, sticker-like cards with offset shadows; each district has its own color. */
+:root{
+  --paper:#FBF4E6; --paper-2:#F3E7CF; --card:#FFFDF8; --ink:#3F3024; --ink-2:#7A6552; --ink-3:#A8957F;
+  --lu:#B9854F; --dan:#F2B632; --blush:#F2A28F;
+  --cinema:#7C78C8; --cinema-soft:#E6E4F8;
+  --canteen:#E2785A; --canteen-soft:#FBE3D8;
+  --travel:#3F9B82; --travel-soft:#D8EFE6;
+  --want:#A99C8C;
+  --invest:#C98A12; --invest-soft:#FBF0D2;
+  --up:#D9453B; --down:#2E9B62;
+  --sea:#DCEDEA; --land:#F7EBD2; --land-line:#9C8466; --visited:#CDEBDF;
+  --font-display:'ZCOOL KuaiLe','Patrick Hand','PingFang SC','Microsoft YaHei',sans-serif;
+  --font-body:'Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;
+  --font-hand:'Patrick Hand','ZCOOL KuaiLe',cursive;
+  --r:18px 22px 16px 24px / 22px 16px 24px 18px;
+  --r-sm:10px 13px 9px 14px / 13px 9px 14px 10px;
+  --shadow:3px 4px 0 var(--ink);
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0}
+body{
+  background-color:var(--paper);
+  background-image:radial-gradient(rgba(63,48,36,.07) 1px, transparent 1.2px);
+  background-size:20px 20px;
+  color:var(--ink); font-family:var(--font-body); font-size:15px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+body.modal-open{overflow:hidden}
+img{max-width:100%;display:block}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;line-height:1.25;text-wrap:balance;margin:0}
+.num{font-family:var(--font-hand);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+:focus-visible{outline:3px dashed var(--dan);outline-offset:3px}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- header ---------- */
+.topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:2.5px solid var(--ink)}
+.topbar-in{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:18px}
+.brand{display:flex;align-items:center;gap:6px;text-decoration:none}
+.brand-mascots{display:flex;align-items:flex-end}
+.brand-mascots > *{margin-right:-8px}
+.brand-name{font-family:var(--font-display);font-size:24px;margin-left:10px;white-space:nowrap}
+.nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.nav a{text-decoration:none;padding:6px 14px;border:2px solid transparent;border-radius:var(--r-sm);font-family:var(--font-display);font-size:17px;display:flex;align-items:center;gap:6px}
+.nav a:hover{border-color:var(--ink)}
+.nav a[aria-current="page"]{border-color:var(--ink);box-shadow:2px 3px 0 var(--ink);background:var(--card)}
+.nav a[data-d="cinema"][aria-current="page"]{background:var(--cinema-soft)}
+.nav a[data-d="canteen"][aria-current="page"]{background:var(--canteen-soft)}
+.nav a[data-d="travel"][aria-current="page"]{background:var(--travel-soft)}
+.nav a[data-d="home"][aria-current="page"]{background:#FCEFC4}
+.nav a[data-d="invest"][aria-current="page"]{background:var(--invest-soft)}
+body.no-admin .admin-only{display:none !important}
+.gear{border:2px solid var(--ink);background:var(--card);border-radius:50%;width:38px;height:38px;display:grid;place-items:center;cursor:pointer;flex:none}
+.gear:hover{background:#FCEFC4}
+.bottom-nav{display:none}
+
+/* ---------- layout ---------- */
+main{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+.banner{max-width:1180px;margin:12px auto 0;padding:10px 16px;border:2px dashed var(--ink-2);border-radius:var(--r-sm);background:#FFF7DD;color:var(--ink);font-size:14px}
+.banner[hidden]{display:none}
+.wrap-banner{padding:0 20px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border:2.5px solid var(--ink);border-radius:var(--r-sm);background:var(--card);cursor:pointer;font-weight:500;box-shadow:2px 3px 0 var(--ink);transition:transform .08s, box-shadow .08s;text-decoration:none;white-space:nowrap;line-height:1.3}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:3px 4px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
+.btn.primary{background:var(--dan)}
+.btn.cinema{background:var(--cinema);color:#fff}
+.btn.canteen{background:var(--canteen);color:#fff}
+.btn.travel{background:var(--travel);color:#fff}
+.btn.ghost{box-shadow:none;border-style:dashed;background:transparent}
+.btn.ghost:hover{box-shadow:none;transform:none;background:var(--card)}
+.btn.danger{color:#B23B2A;border-color:#B23B2A;box-shadow:2px 3px 0 #B23B2A}
+.btn.small{padding:4px 10px;font-size:13px;border-width:2px;box-shadow:1.5px 2px 0 var(--ink)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.edit-only{display:none !important}
+body.can-edit .edit-only{display:inline-flex !important}
+body.can-edit div.edit-only, body.can-edit section.edit-only{display:block !important}
+
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:var(--r);box-shadow:var(--shadow)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:1px 10px;border:1.8px solid var(--ink);border-radius:999px;font-size:13px;background:var(--card);white-space:nowrap}
+.chip.cinema{background:var(--cinema-soft)} .chip.canteen{background:var(--canteen-soft)} .chip.travel{background:var(--travel-soft)}
+.chip.want{border-style:dashed;color:var(--ink-2)}
+.chip.again{background:#FDE2DC}
+.muted{color:var(--ink-2)}
+.tiny{font-size:12.5px}
+
+/* section header */
+.district-head{display:flex;align-items:center;gap:18px;margin:4px 0 18px;flex-wrap:wrap}
+.district-head .icon{flex:none}
+.district-head h1{font-size:36px}
+.district-head p{margin:2px 0 0;color:var(--ink-2)}
+.district-head .head-actions{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.tabs{display:flex;gap:0;border:2.5px solid var(--ink);border-radius:var(--r-sm);overflow:hidden;background:var(--card)}
+.tabs button{border:0;background:transparent;padding:6px 14px;cursor:pointer;border-right:2px solid var(--ink);font-family:var(--font-display);font-size:16px}
+.tabs button:last-child{border-right:0}
+.tabs button[aria-pressed="true"]{background:var(--dan)}
+.search{flex:1;min-width:160px;max-width:320px;padding:7px 12px;border:2.5px solid var(--ink);border-radius:var(--r-sm);background:var(--card)}
+select.sel{padding:7px 10px;border:2.5px solid var(--ink);border-radius:var(--r-sm);background:var(--card);cursor:pointer}
+
+.empty{padding:36px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--ink-2)}
+.empty .pair{display:flex;gap:4px}
+.empty h3{color:var(--ink);font-size:22px}
+
+/* ---------- home ---------- */
+.hero{display:grid;grid-template-columns:1.15fr 1fr;gap:24px;align-items:center;padding:26px 30px;margin-bottom:28px;background:var(--card);border:2.5px solid var(--ink);border-radius:var(--r);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero h1{font-size:44px;margin-bottom:8px}
+.hero .motto{font-size:17px;color:var(--ink-2);margin:0 0 16px}
+.days{display:inline-flex;align-items:baseline;gap:8px;padding:8px 18px;background:#FCEFC4;border:2.5px solid var(--ink);border-radius:var(--r-sm);font-size:16px}
+.days b{font-family:var(--font-hand);font-size:34px;line-height:1;font-weight:400}
+.hero-art{position:relative;display:flex;justify-content:center;align-items:flex-end;min-height:220px}
+.hero-art .town{position:absolute;inset:auto 0 0 0;width:100%;height:auto}
+.hero-art .duo{position:relative;display:flex;align-items:flex-end;gap:6px;margin-bottom:4%;z-index:1;max-width:62%}
+.hero-art .duo > *{max-width:50%;height:auto}
+.hero-art .duo > :first-child{transform:rotate(-4deg)}
+.hero-art .duo > :last-child{transform:rotate(5deg)}
+.bubble{position:absolute;top:6px;right:12%;background:var(--card);border:2px solid var(--ink);border-radius:16px;padding:4px 12px;font-family:var(--font-display);font-size:16px}
+.bubble::after{content:"";position:absolute;left:18px;bottom:-9px;width:12px;height:12px;background:var(--card);border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
+
+.districts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;margin-bottom:34px}
+.dcard{display:flex;flex-direction:column;gap:10px;padding:18px 20px 16px;text-decoration:none;transition:transform .12s}
+.dcard:hover{transform:rotate(-.6deg) translateY(-3px)}
+.dcard.cinema{background:var(--cinema-soft)} .dcard.canteen{background:var(--canteen-soft)} .dcard.travel{background:var(--travel-soft)}
+.soon-note{display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:14px;margin:-14px 0 30px;padding:6px 14px;border:2px dashed rgba(63,48,36,.3);border-radius:var(--r-sm);width:fit-content}
+.dcard-top{display:flex;align-items:center;gap:12px}
+.dcard h2{font-size:26px}
+.dcard .stat{font-size:15px}
+.dcard .stat b{font-family:var(--font-hand);font-size:24px;font-weight:400;margin:0 2px}
+.dcard .latest{font-size:14px;color:var(--ink-2);border-top:2px dashed rgba(63,48,36,.25);padding-top:8px;margin-top:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dcard .go{font-family:var(--font-display);font-size:15px}
+
+.section-title{display:flex;align-items:baseline;gap:10px;margin:0 0 12px}
+.section-title h2{font-size:26px}
+.feed{display:flex;flex-direction:column;gap:10px}
+.feed-item{display:flex;align-items:center;gap:14px;padding:10px 14px;background:var(--card);border:2px solid var(--ink);border-radius:var(--r-sm);cursor:pointer;text-align:left;width:100%}
+.feed-item:hover{background:#FFF8E6}
+.feed-thumb{width:52px;height:52px;flex:none;border:2px solid var(--ink);border-radius:10px;overflow:hidden;display:grid;place-items:center;background:var(--paper-2)}
+.feed-thumb img{width:100%;height:100%;object-fit:cover}
+.feed-main{min-width:0;flex:1}
+.feed-title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-sub{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-date{font-family:var(--font-hand);color:var(--ink-2);font-size:16px;flex:none}
+
+/* ---------- cinema ---------- */
+.poster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:22px}
+.poster-card{background:none;border:0;padding:0;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:8px}
+.poster{aspect-ratio:2/3;border:2.5px solid var(--ink);border-radius:var(--r-sm);box-shadow:var(--shadow);overflow:hidden;position:relative;background:var(--cinema-soft);transition:transform .12s}
+.poster-card:hover .poster{transform:rotate(-1.2deg) translateY(-3px)}
+.poster img{width:100%;height:100%;object-fit:cover}
+.poster-ph{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:12px}
+.poster-ph .pt{font-family:var(--font-display);font-size:22px;line-height:1.2;word-break:break-word}
+.poster-ph .pf{display:flex;justify-content:flex-end;opacity:.8}
+.poster-meta .t{font-weight:700;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.poster-meta .d{font-size:13px;color:var(--ink-2)}
+.mini-ratings{display:flex;gap:10px;font-size:13px;align-items:center;flex-wrap:wrap}
+.mini-ratings > span{display:inline-flex;align-items:center;gap:3px}
+.stars svg{flex:none}
+.who-dot{width:18px;height:18px;border-radius:50%;border:1.6px solid var(--ink);display:inline-grid;place-items:center;font-size:11px;font-family:var(--font-display);line-height:1}
+.who-dot.lu{background:#E3C29F} .who-dot.dan{background:#FFF6DA}
+.diff-badge{position:absolute;top:8px;left:8px;background:var(--card);border:2px solid var(--ink);border-radius:999px;padding:0 8px;font-size:12px}
+
+/* stars */
+.stars{position:relative;display:inline-block;line-height:0;white-space:nowrap;vertical-align:middle}
+.stars svg{width:var(--s,16px);height:var(--s,16px)}
+.stars-bg svg path{fill:#EADFCB;stroke:var(--ink-3)}
+.stars-fg{position:absolute;inset:0 auto 0 0;overflow:hidden;white-space:nowrap}
+.stars-fg svg path{fill:var(--dan);stroke:var(--ink)}
+.star-input{display:inline-flex;align-items:center;gap:10px;cursor:pointer;user-select:none;touch-action:manipulation}
+.star-val{font-family:var(--font-hand);font-size:18px;color:var(--ink-2);min-width:3em}
+
+/* ---------- canteen ---------- */
+.meal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px}
+.meal-card{padding:0;overflow:hidden;cursor:pointer;text-align:left;display:flex;flex-direction:column;transition:transform .12s}
+.meal-card:hover{transform:translateY(-3px)}
+.meal-photo{aspect-ratio:1/1;background:var(--canteen-soft);border-bottom:2.5px solid var(--ink);display:grid;place-items:center;overflow:hidden;position:relative}
+.meal-photo img{width:100%;height:100%;object-fit:cover}
+.meal-photo img{object-position:center}
+.meal-photo .count{position:absolute;right:6px;top:6px;background:rgba(255,253,248,.85);border:1.5px solid var(--ink);border-radius:999px;padding:0 7px;font-size:11.5px;line-height:1.6}
+.meal-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
+.meal-body .t{font-weight:700;font-size:16px;line-height:1.35}
+.meal-body .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.price{font-family:var(--font-hand);font-size:19px}
+.view-toggle{margin-left:auto}
+/* invest */
+.btn.invest{background:var(--invest);color:#fff}
+.chip.invest{background:var(--invest-soft)}
+.dcard.invest{background:var(--invest-soft)}
+.pnl-red{color:var(--up)} .pnl-green{color:var(--down)}
+.inv-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:18px}
+.inv-tile{padding:14px 18px}
+.inv-cur{font-family:var(--font-display);font-size:20px;margin-bottom:6px}
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px 16px}
+.inv-grid > div{display:flex;flex-direction:column}
+.inv-grid b{font-weight:400;font-size:20px;line-height:1.3}
+.inv-grid.big b{font-size:24px}
+.inv-grid small{font-size:13px}
+.inv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+.inv-card{padding:14px 18px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:transform .12s}
+.inv-card:hover{transform:translateY(-3px)}
+.inv-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.inv-name{font-weight:700;font-size:17px}
+.inv-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:2px dashed rgba(63,48,36,.2);padding-top:8px}
+.inv-nums > div{display:flex;flex-direction:column;min-width:0}
+.inv-nums b{font-weight:400;font-size:17px;line-height:1.3;overflow-wrap:anywhere}
+.inv-nums small{font-size:12px}
+.inv-thesis{color:var(--ink-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.price-quick{display:flex !important;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;padding:10px 12px;border:2px dashed rgba(63,48,36,.3);border-radius:var(--r-sm)}
+body:not(.can-edit) .price-quick{display:none !important}
+.price-quick input{padding:5px 10px;border:2px solid var(--ink);border-radius:var(--r-sm);background:var(--card);width:150px}
+.tx-table-wrap{overflow-x:auto}
+.tx-table{width:100%;border-collapse:collapse;font-size:14px}
+.tx-table th{text-align:left;font-size:12.5px;color:var(--ink-2);font-weight:500;border-bottom:2px solid var(--ink);padding:4px 8px}
+.tx-table td{padding:6px 8px;border-bottom:1px dashed rgba(63,48,36,.25);white-space:nowrap}
+.tx-table td:last-child{white-space:normal}
+.tx-kind{padding:0 8px;border-radius:999px;border:1.5px solid var(--ink);font-size:12.5px}
+.tx-kind.buy{background:#FDE2DC} .tx-kind.sell{background:#D8EFE6} .tx-kind.div{background:#FCEFC4}
+.tx-row{display:grid;grid-template-columns:140px 110px 1fr 1fr 1fr 1fr 1.6fr 34px;gap:6px;align-items:center;margin-bottom:6px}
+.tx-row input, .tx-row select{width:100%;padding:6px 8px;border:2px solid var(--ink);border-radius:10px;background:var(--card);min-width:0}
+.tx-row[data-kind="buy"] .tx-amount, .tx-row[data-kind="sell"] .tx-amount{visibility:hidden}
+.tx-row[data-kind="div"] .tx-qty, .tx-row[data-kind="div"] .tx-price, .tx-row[data-kind="div"] .tx-fee,
+.tx-row[data-kind="fee"] .tx-qty, .tx-row[data-kind="fee"] .tx-price, .tx-row[data-kind="fee"] .tx-fee{visibility:hidden}
+.tx-preview{padding:8px 10px;background:var(--paper-2);border-radius:10px}
+
+/* ---------- travel ---------- */
+.travel-stats{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.tstat{padding:8px 16px;background:var(--card);border:2px solid var(--ink);border-radius:var(--r-sm)}
+.tstat b{font-family:var(--font-hand);font-size:28px;font-weight:400;margin-right:4px}
+.trip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px}
+.trip-card{padding:0;overflow:hidden;cursor:pointer;text-align:left;display:flex;flex-direction:column;transition:transform .12s}
+.trip-card:hover{transform:rotate(.6deg) translateY(-3px)}
+.trip-cover{aspect-ratio:16/10;background:var(--travel-soft);border-bottom:2.5px solid var(--ink);display:grid;place-items:center;overflow:hidden}
+.trip-cover img{width:100%;height:100%;object-fit:cover}
+.trip-body{padding:12px 16px 16px;display:flex;flex-direction:column;gap:6px}
+.trip-body h3{font-size:22px}
+.trip-places{display:flex;gap:6px;flex-wrap:wrap}
+.map-block{margin-bottom:24px}
+
+/* ---------- map ---------- */
+.geomap{position:relative;height:var(--map-h,380px);border:2.5px solid var(--ink);border-radius:var(--r);overflow:hidden;background:var(--sea);box-shadow:var(--shadow)}
+.geomap.flat{box-shadow:none;border-width:2px}
+.map-svg{display:block;width:100%;height:100%;cursor:grab;touch-action:pan-x pan-y;
+  background-color:var(--sea);
+  background-image:radial-gradient(circle at 10px 10px, rgba(255,255,255,.55) 1.2px, transparent 1.6px);background-size:24px 24px}
+.map-svg:active{cursor:grabbing}
+.map-svg.pickable{cursor:crosshair;touch-action:none}
+.map-nudge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(63,48,36,.82);color:#FFFDF8;padding:8px 16px;border-radius:999px;font-size:14px;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap;z-index:6}
+.map-nudge.on{opacity:1}
+.map-svg path{vector-effect:non-scaling-stroke}
+.land path.country{fill:var(--land);stroke:var(--land-line);stroke-width:.8}
+.land path.country.visited{fill:var(--visited)}
+.land path.country.sg{fill:#F9EDD5}
+.prov path{fill:none;stroke:var(--land-line);stroke-width:.5;stroke-dasharray:2 3;opacity:0}
+.prov path.visited{fill:#86CBB0;fill-opacity:.8;opacity:1;stroke-dasharray:none}
+.map-svg.z-prov .prov path{opacity:.8}
+.sg-pa path{fill:none;stroke:#CBB490;stroke-width:.7;stroke-dasharray:3 3;opacity:0}
+.map-svg.z-lm .sg-pa path{opacity:1}
+.labels text{font-family:var(--font-hand),var(--font-body);paint-order:stroke;stroke:#FFFDF8;stroke-width:3px;fill:var(--ink-2);text-anchor:middle}
+.labels .lbl-lm, .labels .lbl-pa{display:none}
+.map-svg.z-lm .labels .lbl-lm{display:inline}
+.map-svg.z-pa .labels .lbl-pa{display:inline}
+.labels .lbl-lm text{font-size:13px;fill:var(--ink)}
+.labels .lbl-pa text{font-size:11px;fill:var(--ink-3);letter-spacing:.04em}
+.labels .lbl-lm circle{fill:var(--ink);stroke:none}
+g.pin{cursor:pointer;outline:none}
+.ext-urban path{fill:rgba(190,140,80,.16);stroke:rgba(190,140,80,.35);stroke-width:.5}
+.map-svg.z-city .land path.country.visited{fill:var(--land)}
+.map-svg.z-city .prov path.visited{fill-opacity:.28}
+.map-svg.z-st .labels .lbl-lm{display:none}
+.ext-lakes path{fill:var(--sea);stroke:#9CC3C4;stroke-width:.6}
+.ext-rivers path{fill:none;stroke:#8EC1CF;stroke-width:1}
+.ext-roads path{fill:none;stroke:#D9A877;stroke-width:.8}
+.ext-roads path.major{stroke:#C98B55;stroke-width:1.4}
+.map-svg:not(.z-riv) .ext-rivers, .map-svg:not(.z-riv) .ext-lakes, .map-svg:not(.z-city) .ext-urban, .map-svg:not(.z-city) .ext-roads{display:none}
+.rail path{fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.map-svg.z-lm .rail path{opacity:.85}
+.labels .lbl-st{display:none}
+.map-svg.z-lm .labels .lbl-st{display:inline}
+.labels .lbl-st circle{fill:#FFFDF8;stroke:var(--ink);stroke-width:1.3}
+.labels .lbl-st text{font-size:10.5px;fill:var(--ink-2);display:none}
+.map-svg.z-st .labels .lbl-st text{display:inline}
+.map-svg.z-st .labels .lbl-pa{display:none}
+.routes path{fill:none;stroke:var(--ink);stroke-width:1.8;stroke-dasharray:5 5;opacity:.65}
+.routes path.want{stroke:var(--ink-3);opacity:.6}
+.pin-photo .ph-ring{fill:#FFFDF8;stroke:var(--ink);stroke-width:2.2}
+.pin-photo .ph-tail{fill:var(--ink)}
+.pin-photo .ph-num{fill:var(--dan);stroke:var(--ink);stroke-width:1.5}
+.pin-photo .ph-numt{font-size:10px;font-weight:700;text-anchor:middle;fill:var(--ink);font-family:var(--font-body)}
+g.pin .pin-photo{display:none}
+.map-svg.z-photo g.pin.has-photo .pin-photo{display:inline}
+.map-svg.z-photo g.pin.has-photo .pin-std{display:none}
+.map-svg.z-photo g.pin.has-photo .pin-lbl{transform:translate(12px,-16px)}
+g.pin:hover .ph-ring, g.pin:focus .ph-ring{stroke-width:3.4}
+g.pin path{fill:var(--pin,#E2785A);stroke:var(--ink);stroke-width:1.6;vector-effect:none}
+g.pin circle{fill:#FFFDF8;stroke:none}
+g.pin[data-kind="want"] path{fill:#E9E1D3;stroke-dasharray:3 2}
+g.pin .pin-lbl{font-size:12.5px;font-family:var(--font-body);font-weight:500;paint-order:stroke;stroke:#FFFDF8;stroke-width:3.5px;fill:var(--ink);display:none;pointer-events:none}
+.map-svg.z-pinlbl g.pin .pin-lbl{display:inline}
+g.pin:hover path, g.pin:focus path{stroke-width:2.6}
+g.pick path{fill:var(--dan);stroke:var(--ink);stroke-width:2;vector-effect:none}
+g.pick circle{fill:var(--ink)}
+.map-ctrl{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:6px}
+.map-ctrl button{width:34px;height:34px;border:2px solid var(--ink);background:var(--card);border-radius:10px;cursor:pointer;font-size:18px;line-height:1;box-shadow:1.5px 2px 0 var(--ink)}
+.map-ctrl .map-i{width:24px;height:24px;font-size:12px;font-family:Georgia,serif;font-style:italic;align-self:center;opacity:.55;box-shadow:none;border-width:1.5px}
+.map-attr{position:absolute;right:10px;top:122px;max-width:240px;background:rgba(255,253,248,.95);border:1.5px solid var(--ink);border-radius:10px;padding:6px 10px;font-size:11.5px;color:var(--ink-2);z-index:5}
+.map-views{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap;max-width:calc(100% - 70px)}
+.map-views button{border:2px solid var(--ink);background:var(--card);border-radius:999px;padding:2px 12px;font-size:13px;cursor:pointer;box-shadow:1.5px 2px 0 var(--ink)}
+.map-views button:hover{background:#FCEFC4}
+.map-legend{position:absolute;left:10px;bottom:10px;display:flex;gap:10px;flex-wrap:wrap;background:rgba(255,253,248,.92);border:2px solid var(--ink);border-radius:10px;padding:3px 10px;font-size:12.5px}
+.map-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ink);margin-right:4px;vertical-align:-1px}
+.map-hint{position:absolute;right:10px;bottom:10px;font-size:12px;color:var(--ink-2);background:rgba(255,253,248,.85);border-radius:8px;padding:1px 8px}
+.map-loading{display:grid;place-items:center;height:100%;color:var(--ink-2)}
+.map-pop{position:absolute;z-index:5;transform:translate(-50%,-100%);margin-top:-30px;min-width:200px;max-width:270px;background:var(--card);border:2.5px solid var(--ink);border-radius:14px;padding:10px 12px;box-shadow:2px 3px 0 var(--ink);font-size:14px}
+.map-pop h4{margin:0 22px 2px 0;font-size:15px;line-height:1.35}
+.map-pop .x{position:absolute;top:4px;right:6px;border:0;background:none;cursor:pointer;font-size:18px;line-height:1}
+.map-pop .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+/* ---------- modal ---------- */
+#modals{position:relative;z-index:50}
+.backdrop{position:fixed;inset:0;background:rgba(63,48,36,.45);display:flex;align-items:flex-start;justify-content:center;padding:4vh 14px;overflow-y:auto}
+.modal{width:100%;max-width:640px;background:var(--paper);border:2.5px solid var(--ink);border-radius:var(--r);box-shadow:5px 6px 0 var(--ink);position:relative;margin-bottom:6vh}
+.modal.wide{max-width:900px}
+.modal-head{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:2.5px dashed rgba(63,48,36,.35)}
+.modal-head h2{font-size:24px;flex:1}
+.modal-x{border:2px solid var(--ink);background:var(--card);border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;line-height:1;flex:none}
+.modal-body{padding:18px 20px 22px}
+.modal-foot{display:flex;gap:10px;justify-content:flex-end;padding:0 20px 20px;flex-wrap:wrap}
+.modal-foot .left{margin-right:auto}
+
+/* forms */
+.form{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field > label, .flabel{font-weight:700;font-size:14px}
+.req{color:var(--canteen)}
+.field input[type=text], .field input[type=date], .field input[type=number], .field input[type=url], .field textarea, .field select, .dual input, .dual textarea, .lp input{
+  width:100%;padding:8px 12px;border:2px solid var(--ink);border-radius:var(--r-sm);background:var(--card);
+}
+.field textarea, .dual textarea{resize:vertical;min-height:70px}
+.hint{font-size:12.5px;color:var(--ink-2)}
+.err{font-size:13px;color:#B23B2A}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1.2fr .8fr 1fr;gap:12px}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:var(--r-sm);overflow:hidden;background:var(--card);width:fit-content;flex-wrap:wrap}
+.seg label{cursor:pointer}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;padding:5px 14px;border-right:2px solid var(--ink)}
+.seg label:last-child span{border-right:0}
+.seg input:checked + span{background:var(--dan)}
+.seg input:focus-visible + span{outline:3px dashed var(--ink);outline-offset:-4px}
+.suggest{display:flex;gap:6px;flex-wrap:wrap}
+.suggest button{border:1.6px dashed var(--ink-2);background:transparent;border-radius:999px;padding:0 10px;font-size:13px;cursor:pointer;color:var(--ink-2)}
+.suggest button.on{border-style:solid;border-color:var(--ink);background:#FCEFC4;color:var(--ink)}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dual-col{display:flex;flex-direction:column;gap:8px;padding:12px;border:2px solid var(--ink);border-radius:var(--r-sm);background:var(--card)}
+.dual-col.lu{background:#F7EADC} .dual-col.dan{background:#FFF8E4}
+.dual-head{display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:17px}
+.check{display:inline-flex;align-items:center;gap:8px;cursor:pointer;width:fit-content}
+.check input{width:18px;height:18px;accent-color:var(--canteen)}
+fieldset.box{border:2px dashed rgba(63,48,36,.35);border-radius:var(--r-sm);padding:12px 14px 14px;margin:0;display:flex;flex-direction:column;gap:10px}
+fieldset.box legend{font-weight:700;font-size:14px;padding:0 6px}
+
+/* photos field */
+.photos{display:flex;gap:10px;flex-wrap:wrap}
+.ph{position:relative;width:92px;height:92px;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:var(--paper-2)}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph .rm, .ph .cover{position:absolute;top:3px;border:1.6px solid var(--ink);background:var(--card);border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:13px;line-height:1;display:grid;place-items:center;padding:0}
+.ph .rm{right:3px} .ph .cover{left:3px}
+.ph.first::after{content:"封面";position:absolute;left:0;right:0;bottom:0;background:rgba(63,48,36,.7);color:#fff;font-size:11px;text-align:center}
+.ph.busy{display:grid;place-items:center;font-size:12px;color:var(--ink-2)}
+.ph-add{width:92px;height:92px;border:2px dashed var(--ink);border-radius:12px;display:grid;place-items:center;cursor:pointer;color:var(--ink-2);font-size:13px;text-align:center;background:transparent}
+.ph-add:hover{background:var(--card)}
+
+/* location picker */
+.lp{display:flex;flex-direction:column;gap:8px}
+.lp-row{display:flex;gap:8px;align-items:center}
+.lp-search{position:relative;flex:1}
+.lp-results{position:absolute;left:0;right:0;top:100%;z-index:4;background:var(--card);border:2px solid var(--ink);border-radius:10px;margin-top:4px;max-height:260px;overflow:auto;box-shadow:2px 3px 0 var(--ink)}
+.lp-results button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;border:0;background:none;padding:7px 12px;cursor:pointer;border-bottom:1px dashed rgba(63,48,36,.2)}
+.lp-results button:hover, .lp-results button:focus{background:#FCEFC4}
+.lp-status{font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 10px;border-radius:10px;background:var(--paper-2)}
+.lp-status.none{color:var(--ink-2)}
+
+/* detail */
+.detail-top{display:grid;grid-template-columns:220px 1fr;gap:22px}
+.detail-top.noside{grid-template-columns:1fr}
+.detail-poster{aspect-ratio:2/3;border:2.5px solid var(--ink);border-radius:var(--r-sm);overflow:hidden;position:relative;background:var(--cinema-soft);box-shadow:var(--shadow)}
+.detail-poster img{width:100%;height:100%;object-fit:cover}
+.detail-info{display:flex;flex-direction:column;gap:10px;min-width:0}
+.detail-info h3{font-size:30px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.say{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.say-col{display:flex;flex-direction:column;gap:8px}
+.say-head{display:flex;align-items:center;gap:8px}
+.say-head .nm{font-family:var(--font-display);font-size:18px}
+.say-bubble{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:8px 12px;position:relative;font-size:15px}
+.say-col.lu .say-bubble{background:#F7EADC}
+.say-col.dan .say-bubble{background:#FFF8E4}
+.say-long{font-size:14.5px;color:var(--ink);white-space:normal;padding:2px 4px}
+.prose{max-width:65ch}
+.gallery-main{aspect-ratio:4/3;border:2.5px solid var(--ink);border-radius:var(--r-sm);overflow:hidden;background:var(--paper-2);cursor:zoom-in}
+.gallery-main img{width:100%;height:100%;object-fit:cover}
+.gallery-thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.gallery-thumbs button{width:64px;height:64px;padding:0;border:2px solid var(--ink);border-radius:10px;overflow:hidden;cursor:pointer;background:none}
+.gallery-thumbs button[aria-current="true"]{outline:3px solid var(--dan);outline-offset:1px}
+.gallery-thumbs img{width:100%;height:100%;object-fit:cover}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.photo-grid button{padding:0;border:2px solid var(--ink);border-radius:12px;overflow:hidden;aspect-ratio:1;cursor:zoom-in;background:none}
+.photo-grid img{width:100%;height:100%;object-fit:cover}
+.place-list{display:flex;flex-direction:column;gap:8px}
+.place-item{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;border:2px solid var(--ink);border-radius:var(--r-sm);background:var(--card)}
+.place-item .pn{font-weight:700}
+.place-item .acts{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pi-main{min-width:0;flex:1}
+.place-photos{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.place-photos > *{width:58px;height:58px;padding:0;border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--paper-2);cursor:zoom-in;display:grid;place-items:center;font-size:13px}
+.place-photos img{width:100%;height:100%;object-fit:cover}
+.pop-strip{display:flex;gap:4px;margin:0 22px 6px 0;align-items:center}
+.pop-strip button{width:52px;height:52px;padding:0;border:1.6px solid var(--ink);border-radius:8px;overflow:hidden;cursor:zoom-in;background:var(--paper-2)}
+.pop-strip img{width:100%;height:100%;object-fit:cover}
+.pop-strip .more{font-size:12px;color:var(--ink-2)}
+.trip-cover{position:relative}
+.trip-cover .count{position:absolute;right:8px;bottom:8px;background:var(--card);border:2px solid var(--ink);border-radius:999px;padding:0 8px;font-size:12px}
+.place-num{width:24px;height:24px;border-radius:50%;background:var(--travel);color:#fff;display:grid;place-items:center;font-size:13px;flex:none;margin-top:2px;border:1.6px solid var(--ink)}
+.subhead{font-family:var(--font-display);font-size:19px;margin:18px 0 8px}
+.loc-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* lightbox */
+.lightbox{position:fixed;inset:0;z-index:80;background:rgba(30,22,16,.92);display:flex;align-items:center;justify-content:center}
+.lightbox img{max-width:92vw;max-height:86vh;border-radius:10px;border:3px solid #FFFDF8}
+.lightbox button{position:absolute;border:2px solid #FFFDF8;background:rgba(0,0,0,.3);color:#FFFDF8;border-radius:50%;width:44px;height:44px;font-size:22px;cursor:pointer}
+.lightbox .lx{top:16px;right:16px} .lightbox .lp-prev{left:16px;top:50%} .lightbox .lp-next{right:16px;top:50%}
+.lightbox .lc{position:absolute;bottom:14px;color:#FFFDF8;font-family:var(--font-hand);font-size:18px}
+
+/* random picker */
+.roulette{display:flex;flex-direction:column;align-items:center;gap:14px;padding:10px 0;text-align:center}
+.roulette .slot{font-family:var(--font-display);font-size:32px;min-height:52px;padding:6px 22px;border:2.5px solid var(--ink);border-radius:var(--r-sm);background:var(--card);box-shadow:var(--shadow);min-width:240px}
+
+/* toast */
+#toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:var(--ink);color:#FFFDF8;padding:8px 18px;border-radius:999px;font-size:14px;box-shadow:2px 3px 0 rgba(0,0,0,.2);animation:pop .2s ease-out}
+.toast.err{background:#B23B2A}
+@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+footer{max-width:1180px;margin:0 auto;padding:20px 20px 40px;color:var(--ink-2);font-size:12.5px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;border-top:2px dashed rgba(63,48,36,.25)}
+footer .fbtns{margin-left:auto;display:flex;gap:8px}
+
+.settings-av{display:flex;gap:18px;flex-wrap:wrap}
+.settings-av .one{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 14px;border:2px solid var(--ink);border-radius:var(--r-sm);background:var(--card)}
+.avatar-img{object-fit:contain;flex:none}
+.avatar-img.photo{border-radius:28%;background:#FFFDF8;border:2px solid var(--ink);padding:1px;object-fit:cover}
+.avatar-img.cut{border:0;background:transparent;border-radius:0;padding:0;filter:drop-shadow(1px 2px 0 rgba(63,48,36,.25))}
+.checker{background:conic-gradient(#EFE6D6 25%, #FFFDF8 0 50%, #EFE6D6 0 75%, #FFFDF8 0) 0 0/18px 18px}
+.cut-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cut-box{display:flex;flex-direction:column;gap:6px;align-items:center}
+.cut-box canvas, .cut-box img{width:100%;max-width:300px;aspect-ratio:1;object-fit:contain;border:2px solid var(--ink);border-radius:var(--r-sm)}
+.cut-ctrl{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.cut-ctrl input[type=range]{width:100%;accent-color:var(--lu)}
+.settings-av .one .btns{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+body.can-edit .settings-av .btns.edit-only{display:flex !important}
+.hero-edit{position:absolute;right:12px;bottom:10px;border:0;background:none;cursor:pointer;font-size:15px;color:var(--ink-3);opacity:.45;padding:4px 6px;border-radius:8px;z-index:2}
+.hero-edit:hover, .hero-edit:focus-visible{opacity:1;background:var(--paper-2)}
+@media (max-width:760px){ .cut-wrap{grid-template-columns:1fr} }
+.export-box{width:100%;height:180px;font-family:monospace;font-size:12px}
+
+@media (max-width:1000px){ .nav a{padding:6px 9px;font-size:16px} .brand-name{font-size:21px} }
+@media (max-width:760px){
+  .topbar-in{padding:8px 14px}
+  .brand-name{font-size:20px}
+  .nav{display:none}
+  .gear{margin-left:auto}
+  .bottom-nav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--paper);border-top:2.5px solid var(--ink);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+  .bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:0;text-decoration:none;font-family:var(--font-display);font-size:13px;padding:2px 0;border-radius:12px}
+  .bottom-nav a[aria-current="page"]{background:#FCEFC4}
+  main{padding:16px 14px 110px}
+  footer{padding-bottom:110px}
+  .hero{grid-template-columns:1fr;padding:20px}
+  .hero h1{font-size:32px}
+  .hero-art{min-height:170px}
+  .district-head h1{font-size:28px}
+  .district-head .head-actions{margin-left:0;width:100%}
+  .poster-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:16px}
+  .row2,.row3,.dual,.say{grid-template-columns:1fr}
+  .inv-list, .inv-summary{grid-template-columns:1fr}
+  .tx-row{grid-template-columns:1fr 1fr;padding:8px;border:2px dashed rgba(63,48,36,.25);border-radius:12px}
+  .tx-row .tx-note{grid-column:1 / -1}
+  .tx-row[data-kind="buy"] .tx-amount, .tx-row[data-kind="sell"] .tx-amount, .tx-row[data-kind="div"] .tx-qty, .tx-row[data-kind="div"] .tx-price, .tx-row[data-kind="div"] .tx-fee, .tx-row[data-kind="fee"] .tx-qty, .tx-row[data-kind="fee"] .tx-price, .tx-row[data-kind="fee"] .tx-fee{display:none}
+  .bottom-nav a{font-size:12px}
+  input, select, textarea{font-size:16px !important}
+  .detail-top{grid-template-columns:1fr}
+  .detail-poster{max-width:200px}
+  .modal-body{padding:14px}
+  .backdrop{padding:2vh 8px}
+  #toasts{bottom:92px}
+  .travel-stats{display:flex;flex-wrap:wrap;gap:6px}
+  .tstat{padding:2px 10px;font-size:12.5px;border-width:1.6px}
+  .tstat b{font-size:19px}
+  .map-views button{padding:1px 9px;font-size:12px}
+}
+
+/* Google Maps version */
+.geomap.gmap .gmap-box{position:absolute;inset:0}
+.geomap.gmap .map-legend{bottom:30px}
+.gpins{position:absolute;left:0;top:0}
+.gpin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;outline:none;line-height:0}
+.gpin.pick{cursor:default}
+.gpin .gp-std{display:block;filter:drop-shadow(1px 2px 0 rgba(63,48,36,.25))}
+.gpin.want .gp-std path{stroke-dasharray:3 2}
+.gpin:hover .gp-std path, .gpin:focus .gp-std path{stroke-width:2.6}
+.gpin .gp-photo{display:none;position:relative;width:44px;height:44px;margin-bottom:9px;border-radius:50%;border:2.5px solid var(--ink);background:#FFFDF8;box-shadow:2px 3px 0 rgba(63,48,36,.35)}
+.gpin .gp-photo img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.gpin .gp-photo::after{content:"";position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);border:6px solid transparent;border-top:9px solid var(--ink)}
+.gpin .gp-photo b{position:absolute;right:-7px;top:-7px;width:19px;height:19px;border-radius:50%;background:var(--dan);border:1.6px solid var(--ink);font:700 10px/16px var(--font-body);text-align:center}
+.geomap.z-photo .gpin.has-photo .gp-std{display:none}
+.geomap.z-photo .gpin.has-photo .gp-photo{display:block}
+.gpin:hover .gp-photo, .gpin:focus .gp-photo{border-width:3.5px}
+.gpin .gp-lbl{display:none;position:absolute;left:calc(100% + 3px);top:6px;white-space:nowrap;font:500 12.5px/1.6 var(--font-body);color:var(--ink);background:rgba(255,253,248,.92);border-radius:6px;padding:0 6px;pointer-events:none}
+.geomap.z-pinlbl .gpin .gp-lbl{display:block}
+.gpop{font-family:var(--font-body);color:var(--ink);font-size:14px;line-height:1.55;max-width:250px}
+.gpop h4{margin:0 0 2px;font-size:15px}
+.gpop .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.gpop .pop-strip{margin-right:0}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <clipPath id="clip-circle" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".5"/></clipPath>
+  <filter id="wobble" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter>
+</defs></svg>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="#home" aria-label="噜包蛋之城首页">
+      <span class="brand-mascots" id="brand-mascots"></span>
+      <span class="brand-name">噜包蛋之城</span>
+    </a>
+    <nav class="nav" aria-label="板块">
+      <a href="#home" data-d="home">城门</a>
+      <a href="#cinema" data-d="cinema">噜蛋影院</a>
+      <a href="#canteen" data-d="canteen">噜蛋食堂</a>
+      <a href="#travel" data-d="travel">噜蛋旅行社</a>
+      <a href="#invest" data-d="invest" class="admin-only">噜蛋投资部</a>
+    </nav>
+    <button class="gear" type="button" data-act="settings" aria-label="城市设置" title="城市设置">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>
+    </button>
+  </div>
+</header>
+<div class="wrap-banner"><div class="banner" id="banner" hidden></div></div>
+<main id="view"></main>
+<footer>
+  <span>噜包蛋之城 · 由噜和蛋共同建设</span>
+  <span class="fbtns"><button class="btn small ghost" type="button" data-act="export">导出完整备份</button></span>
+</footer>
+<nav class="bottom-nav" aria-label="板块">
+  <a href="#home" data-d="home"><span class="bn-ic" data-ic="home"></span>城门</a>
+  <a href="#cinema" data-d="cinema"><span class="bn-ic" data-ic="cinema"></span>影院</a>
+  <a href="#canteen" data-d="canteen"><span class="bn-ic" data-ic="canteen"></span>食堂</a>
+  <a href="#travel" data-d="travel"><span class="bn-ic" data-ic="travel"></span>旅行社</a>
+  <a href="#invest" data-d="invest" class="admin-only"><span class="bn-ic" data-ic="invest"></span>投资部</a>
+</nav>
+<div id="modals"></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script src="api.js"></script>
+<script src="gmap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+"use strict";
+/* =====================================================================
+   噜包蛋之城 — shared home of 噜 (capybara) & 蛋 (boiled egg)
+   Data lives in the artifact db: movies / meals / trips collections + city/meta doc.
+   Photos live in artifact assets; db rows keep asset ids.
+   ===================================================================== */
+
+/* ---------- tiny utils ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nl2br = s => esc(s).replace(/\n/g, '<br>');
+const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const fmtDate = d => { if (!d) return ''; const p = String(d).split('-'); return p.length === 3 ? `${p[0]}.${+p[1]}.${+p[2]}` : d; };
+const WHO = { lu: '噜', dan: '蛋' };
+const CUR = { SGD: 'S$', CNY: '¥', JPY: 'JP¥', HKD: 'HK$', MYR: 'RM', TWD: 'NT$', KRW: '₩', THB: '฿', USD: 'US$', EUR: '€', GBP: '£', AUD: 'A$' };
+function fmtMoney(v, cur, per) {
+  if (v === '' || v == null || isNaN(+v)) return '';
+  const n = (+v).toLocaleString('en', { maximumFractionDigits: 2 });
+  return `${CUR[cur] || (cur ? cur + ' ' : '')}${n}${per === 'pp' ? '/人' : ''}`;
+}
+function hashColor(s, list) { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return list[h % list.length]; }
+function avgStars(it) { const a = it?.lu?.stars || 0, b = it?.dan?.stars || 0; if (a && b) return (a + b) / 2; return a || b || 0; }
+function safeUrl(u) { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : ''; } catch { return ''; } }
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ---------- mascots & icons (original drawings) ---------- */
+const INK = '#4A3424';
+function svgWrap(inner, size, cls = '') {
+  return `<svg class="${cls}" width="${size}" height="${size}" viewBox="0 0 120 120" aria-hidden="true"><g filter="url(#wobble)" stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">${inner}</g></svg>`;
+}
+function luSVG(size = 80, mood = 'happy') {
+  const eyes = mood === 'sleepy'
+    ? `<path d="M36 46 q4 3 8 0 M76 46 q4 3 8 0" fill="none"/>`
+    : `<circle cx="40" cy="46" r="3.4" fill="${INK}" stroke="none"/><circle cx="80" cy="46" r="3.4" fill="${INK}" stroke="none"/><circle cx="41.3" cy="44.7" r="1" fill="#fff" stroke="none"/><circle cx="81.3" cy="44.7" r="1" fill="#fff" stroke="none"/>`;
+  return svgWrap(`
+    <ellipse cx="34" cy="31" rx="5.5" ry="4.5" fill="#9C6B40"/><ellipse cx="86" cy="31" rx="5.5" ry="4.5" fill="#9C6B40"/>
+    <path d="M20 66 C19 38 38 27 60 27 C82 27 101 38 100 66 C100 98 86 110 60 110 C34 110 20 98 20 66 Z" fill="#C4915F"/>
+    <path d="M34 76 C34 62 46 58 60 58 C74 58 86 62 86 76 C86 88 74 93 60 93 C46 93 34 88 34 76 Z" fill="#B07D4C" stroke-width="2.4"/>
+    <ellipse cx="51" cy="68" rx="3.2" ry="2.2" fill="${INK}" stroke="none"/><ellipse cx="69" cy="68" rx="3.2" ry="2.2" fill="${INK}" stroke="none"/>
+    <path d="M60 73 L60 79 M53 82 Q60 87 67 82" fill="none" stroke-width="2.4"/>
+    ${eyes}
+    <ellipse cx="30" cy="58" rx="5" ry="3.2" fill="#F2A28F" stroke="none" opacity=".8"/><ellipse cx="90" cy="58" rx="5" ry="3.2" fill="#F2A28F" stroke="none" opacity=".8"/>
+    <ellipse cx="45" cy="110" rx="8" ry="4.5" fill="#9C6B40"/><ellipse cx="75" cy="110" rx="8" ry="4.5" fill="#9C6B40"/>
+    <path d="M60 27 C60 20 62 15 66 12" fill="none" stroke-width="2.4"/>
+    <path d="M65 13 C70 4 82 4 84 8 C80 16 70 17 65 13 Z" fill="#8CC07A" stroke-width="2.4"/>`, size, 'mascot');
+}
+function danSVG(size = 80, mood = 'happy') {
+  const eyes = mood === 'sleepy'
+    ? `<path d="M44 68 q4 3 8 0 M68 68 q4 3 8 0" fill="none"/>`
+    : `<circle cx="48" cy="68" r="3.2" fill="${INK}" stroke="none"/><circle cx="72" cy="68" r="3.2" fill="${INK}" stroke="none"/><circle cx="49.2" cy="66.8" r="1" fill="#fff" stroke="none"/><circle cx="73.2" cy="66.8" r="1" fill="#fff" stroke="none"/>`;
+  return svgWrap(`
+    <path d="M60 14 C84 14 99 50 99 74 C99 97 83 110 60 110 C37 110 21 97 21 74 C21 50 36 14 60 14 Z" fill="#FFFDF6"/>
+    <path d="M30 44 C35 24 47 14 60 14 C73 14 85 24 90 44 L83 38 L76 46 L69 37 L62 46 L55 37 L48 46 L41 38 L34 47 Z" fill="#EBCB9C"/>
+    <circle cx="74" cy="25" r="2" fill="#C9A06A" stroke="none"/><circle cx="51" cy="28" r="1.6" fill="#C9A06A" stroke="none"/>
+    ${eyes}
+    <path d="M54 79 Q60 85 66 79" fill="none" stroke-width="2.6"/>
+    <ellipse cx="38" cy="78" rx="6" ry="3.6" fill="#F2A28F" stroke="none" opacity=".75"/><ellipse cx="82" cy="78" rx="6" ry="3.6" fill="#F2A28F" stroke="none" opacity=".75"/>
+    <path d="M60 92 C57 89 52 91 54.5 95 L60 100 L65.5 95 C68 91 63 89 60 92 Z" fill="#F6C443" stroke-width="2"/>`, size, 'mascot');
+}
+function iconCinema(size = 64) {
+  return svgWrap(`<rect x="18" y="46" width="84" height="56" rx="8" fill="#B9B5EC"/>
+    <path d="M18 46 L100 30 L104 44 L22 60 Z" fill="#FFFDF6" transform="rotate(-8 18 46)"/>
+    <path d="M30 41 L38 51 M48 37 L56 47 M66 33 L74 43 M84 29 L92 39" fill="none" transform="rotate(-8 18 46)"/>
+    <circle cx="44" cy="74" r="10" fill="#FFFDF6"/><circle cx="76" cy="74" r="10" fill="#FFFDF6"/><path d="M40 92 L80 92" fill="none"/>`, size, 'icon');
+}
+function iconCanteen(size = 64) {
+  return svgWrap(`<path d="M70 18 L50 58 M86 22 L60 60" fill="none" stroke-width="3.4"/>
+    <path d="M14 62 L106 62 C104 88 86 104 60 104 C34 104 16 88 14 62 Z" fill="#F7B49B"/>
+    <path d="M28 62 C30 50 40 44 50 48 C56 40 70 40 74 48 C84 44 94 52 92 62 Z" fill="#FFFDF6"/>
+    <path d="M44 104 L76 104 L72 112 L48 112 Z" fill="#F7B49B"/>
+    <path d="M40 30 q4 -6 0 -12 M54 26 q4 -6 0 -12" fill="none" stroke-width="2.4" opacity=".7"/>`, size, 'icon');
+}
+function iconTravel(size = 64) {
+  return svgWrap(`<path d="M46 34 L46 24 Q46 18 52 18 L68 18 Q74 18 74 24 L74 34" fill="none"/>
+    <rect x="18" y="34" width="84" height="66" rx="10" fill="#9FD3C0"/>
+    <path d="M40 34 L40 100 M80 34 L80 100" fill="none" stroke-width="2.6"/>
+    <circle cx="32" cy="106" r="5" fill="#FFFDF6"/><circle cx="88" cy="106" r="5" fill="#FFFDF6"/>
+    <path d="M56 58 l4 -9 l4 9 l9 1 l-7 6 l2 9 l-8 -5 l-8 5 l2 -9 l-7 -6 Z" fill="#F6C443" stroke-width="2"/>`, size, 'icon');
+}
+function iconSoon(size = 64) {
+  return svgWrap(`<path d="M20 100 L100 100" fill="none"/>
+    <path d="M30 100 L30 54 L60 34 L90 54 L90 100" fill="none" stroke-dasharray="6 6"/>
+    <path d="M50 100 L50 76 L70 76 L70 100" fill="none" stroke-dasharray="5 5"/>
+    <path d="M60 34 L60 12" fill="none" stroke-width="2.4"/><path d="M60 13 L78 18 L60 24 Z" fill="#F6C443" stroke-width="2.2"/>`, size, 'icon');
+}
+function iconHome(size = 64) {
+  return svgWrap(`<path d="M22 100 L22 56 L60 26 L98 56 L98 100 Z" fill="#FCEFC4"/><path d="M48 100 L48 70 Q60 60 72 70 L72 100" fill="#FFFDF6"/>`, size, 'icon');
+}
+function iconInvest(size = 64) {
+  return svgWrap(`<path d="M60 40 C60 28 66 20 76 16 C76 28 70 36 60 40 Z" fill="#8CC07A" stroke-width="2.4"/><path d="M60 40 C60 30 54 24 44 22 C44 32 50 38 60 40 Z" fill="#A9D38F" stroke-width="2.4"/>
+    <path d="M60 40 L60 52" fill="none" stroke-width="2.4"/>
+    <path d="M30 56 Q30 50 36 50 L84 50 Q90 50 90 56 L94 100 Q94 108 86 108 L34 108 Q26 108 26 100 Z" fill="#FCE7A8"/>
+    <ellipse cx="46" cy="94" rx="11" ry="5" fill="#F2B632"/><ellipse cx="46" cy="88" rx="11" ry="5" fill="#F6C443"/>
+    <ellipse cx="72" cy="96" rx="11" ry="5" fill="#F2B632"/><ellipse cx="72" cy="90" rx="11" ry="5" fill="#F6C443"/><ellipse cx="72" cy="84" rx="11" ry="5" fill="#F9D36B"/>
+    <path d="M40 64 L52 64" fill="none" stroke-width="2.4" opacity=".6"/>`, size, 'icon');
+}
+const ICONS = { cinema: iconCinema, canteen: iconCanteen, travel: iconTravel, home: iconHome, invest: iconInvest };
+const STAR = `<svg viewBox="0 0 24 24"><path d="M12 2.8l2.7 5.8 6.3.7-4.7 4.3 1.3 6.3L12 16.8l-5.6 3.1 1.3-6.3L3 9.3l6.3-.7z" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+function starsHTML(v, size = 16) {
+  return `<span class="stars" style="--s:${size}px" aria-label="${v ? v + ' 星' : '未评分'}"><span class="stars-bg">${STAR.repeat(5)}</span><span class="stars-fg" style="width:${(v || 0) / 5 * 100}%">${STAR.repeat(5)}</span></span>`;
+}
+function townSVG() {
+  // houses sit at the two ends; the middle stays open for 噜 and 蛋
+  return `<svg class="town" viewBox="0 0 600 120" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><g filter="url(#wobble)" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round">
+    <path d="M0 98 C70 88 140 94 210 96 C300 99 380 90 460 93 C520 95 570 96 600 92 L600 120 L0 120 Z" fill="#E8DCC0"/>
+    <path d="M230 104 C270 100 330 100 370 104" fill="none" stroke-dasharray="4 6" opacity=".45"/>
+    <path d="M10 98 L10 66 L32 50 L54 66 L54 98" fill="#E6E4F8"/><path d="M25 98 L25 80 L39 80 L39 98" fill="#FFFDF8"/>
+    <path d="M62 98 L62 70 L90 70 L90 98" fill="#FBE3D8"/><path d="M58 72 L76 56 L94 72 Z" fill="#E2785A"/><rect x="70" y="78" width="12" height="10" fill="#FFFDF8"/>
+    <circle cx="108" cy="80" r="9" fill="#B5E0CF"/><path d="M108 89 L108 97" fill="none"/>
+    <circle cx="492" cy="80" r="9" fill="#B5E0CF"/><path d="M492 89 L492 95" fill="none"/>
+    <path d="M508 96 L508 66 L532 52 L556 66 L556 96" fill="#D8EFE6"/><rect x="516" y="72" width="11" height="10" fill="#FFFDF8"/><rect x="537" y="72" width="11" height="10" fill="#FFFDF8"/>
+    <path d="M564 96 L564 74 L592 74 L592 96" fill="#FCEFC4" stroke-dasharray="5 4"/><path d="M578 74 L578 58" fill="none"/><path d="M578 59 L590 63 L578 67 Z" fill="#F2B632"/>
+  </g></svg>`;
+}
+
+/* ---------- state ---------- */
+const S = {
+  db: null, assets: null, downloads: null, user: null,
+  backend: 'pending', canWrite: null, readOnly: false, slow: false,
+  movies: [], meals: [], trips: [], invest: [], meta: {}, isAdmin: null,
+  ready: { movies: false, meals: false, trips: false, meta: false, invest: false },
+  ui: {
+    cinema: { tab: 'done', q: '', year: '', sort: 'recent' },
+    canteen: { tab: 'all', view: 'cards', q: '', sort: 'recent' },
+    travel: { tab: 'done' },
+    invest: { tab: 'open', who: '', sort: 'recent' },
+  },
+  localUrls: {}, maps: {},
+};
+const canEdit = () => S.backend === 'ok' && !S.readOnly && S.canWrite !== false;
+const refIds = r => String(r || '').split('|').filter(Boolean);
+const refFull = r => refIds(r)[0] || '';
+const refThumb = r => { const p = refIds(r); return p[1] || p[0] || ''; };
+const imgUrl = (ref, thumb = false) => { const id = thumb ? refThumb(ref) : refFull(ref); return S.localUrls[id] || ('/photo/' + id); };
+// default: thumbnail (fast lists); pass {full:true} for big views
+function imgTag(ref, alt = '', { full = false, extra = '' } = {}) { return `<img src="${esc(imgUrl(ref, !full))}" alt="${esc(alt)}" loading="lazy" decoding="async" ${extra} data-full="${esc(imgUrl(ref))}" onerror="if(this.dataset.full&&this.src.indexOf(this.dataset.full)<0){this.src=this.dataset.full}else{this.style.visibility='hidden'}">`; }
+async function deleteRefs(refs) { for (const r of refs) for (const id of refIds(r)) { try { await S.assets?.delete(id); } catch {} } }
+function avatar(who, size = 36) {
+  const id = S.meta?.['avatar_' + who];
+  if (id) return `<img class="avatar-img ${S.meta?.['avatar_' + who + '_style'] === 'cut' ? 'cut' : 'photo'}" src="${esc(imgUrl(id, true))}" width="${size}" height="${size}" style="width:${size}px;height:${size}px" alt="${WHO[who]}">`;
+  return who === 'lu' ? luSVG(size) : danSVG(size);
+}
+
+/* ---------- toasts, modals, confirm ---------- */
+function toast(msg, type = '') {
+  const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg;
+  $('#toasts').appendChild(t); setTimeout(() => t.remove(), type === 'err' ? 5200 : 2600);
+}
+const modalStack = [];
+function openModal({ title = '', body = '', foot = '', wide = false, guard = null, onClose = null }) {
+  const bd = document.createElement('div'); bd.className = 'backdrop';
+  bd.innerHTML = `<div class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}">
+    <div class="modal-head"><h2>${title}</h2><button class="modal-x" type="button" aria-label="关闭">×</button></div>
+    <div class="modal-body">${body}</div>${foot ? `<div class="modal-foot">${foot}</div>` : ''}</div>`;
+  $('#modals').appendChild(bd);
+  document.body.classList.add('modal-open');
+  const m = { el: bd, box: $('.modal', bd), guard, onClose, prevFocus: document.activeElement };
+  m.close = async (force = false) => {
+    if (!force && m.guard && !(await m.guard())) return false;
+    const i = modalStack.indexOf(m); if (i >= 0) modalStack.splice(i, 1);
+    bd.remove(); if (!modalStack.length) document.body.classList.remove('modal-open');
+    m.onClose?.(); try { m.prevFocus?.focus?.(); } catch {}
+    return true;
+  };
+  $('.modal-x', bd).addEventListener('click', () => m.close());
+  bd.addEventListener('mousedown', e => { if (e.target === bd && !m.guard) m.close(); });
+  modalStack.push(m);
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  const isForm = !!$('form, .form', m.box);
+  setTimeout(() => { const f = (!coarse && isForm && $('input[type=text],textarea', m.box)) || $('.modal-x', bd); f?.focus({ preventScroll: true }); }, 30);
+  return m;
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if ($('.lightbox')) { $('.lightbox').remove(); return; }
+    const top = modalStack[modalStack.length - 1]; if (top) { e.preventDefault(); top.close(); }
+  }
+});
+function reopen(fn) { setTimeout(fn, 250); }
+function confirmDialog(msg, { ok = '确定', danger = false } = {}) {
+  return new Promise(res => {
+    const m = openModal({ title: '确认一下', body: `<p style="margin:0">${esc(msg)}</p>`,
+      foot: `<button class="btn" type="button" data-r="0">取消</button><button class="btn ${danger ? 'danger' : 'primary'}" type="button" data-r="1">${esc(ok)}</button>` });
+    let done = false;
+    m.onClose = () => { if (!done) res(false); };
+    $$('[data-r]', m.el).forEach(b => b.addEventListener('click', () => { done = true; res(b.dataset.r === '1'); m.close(true); }));
+  });
+}
+function formGuard(root, initial) {
+  return async () => {
+    if (serializeForm(root) === initial) return true;
+    return confirmDialog('有还没保存的内容，确定要关掉吗？', { ok: '不要了，关掉', danger: true });
+  };
+}
+function serializeForm(root) {
+  return $$('input,textarea,select', root).map(i => i.type === 'radio' || i.type === 'checkbox' ? i.checked : i.value).join('\u0001') + '|' + $$('.star-input', root).map(s => s.dataset.value).join(',') + '|' + $$('.photos', root).map(p => p.dataset.ids || '').join(',') + '|' + ($('[data-places]', root)?.dataset.places || '');
+}
+
+/* ---------- lightbox ---------- */
+function openLightbox(ids, i = 0) {
+  if (!ids?.length) return;
+  const lb = document.createElement('div'); lb.className = 'lightbox';
+  const show = () => { lb.innerHTML = `<img src="${esc(imgUrl(ids[i]))}" alt="照片 ${i + 1}"><button class="lx" aria-label="关闭">×</button>${ids.length > 1 ? `<button class="lp-prev" aria-label="上一张">‹</button><button class="lp-next" aria-label="下一张">›</button><div class="lc">${i + 1} / ${ids.length}</div>` : ''}`; };
+  show();
+  lb.addEventListener('click', e => {
+    if (e.target.closest('.lp-prev')) { i = (i - 1 + ids.length) % ids.length; show(); }
+    else if (e.target.closest('.lp-next')) { i = (i + 1) % ids.length; show(); }
+    else if (e.target.tagName !== 'IMG') lb.remove();
+  });
+  let sx = null;
+  lb.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener('touchend', e => { if (sx == null || ids.length < 2) return; const dx = e.changedTouches[0].clientX - sx; sx = null; if (Math.abs(dx) > 40) { i = (i + (dx < 0 ? 1 : -1) + ids.length) % ids.length; show(); } });
+  document.addEventListener('keydown', function k(e) { if (!lb.isConnected) return document.removeEventListener('keydown', k); if (e.key === 'ArrowRight') { i = (i + 1) % ids.length; show(); } if (e.key === 'ArrowLeft') { i = (i - 1 + ids.length) % ids.length; show(); } });
+  document.body.appendChild(lb);
+}
+
+/* ---------- backend ---------- */
+async function getClaude() {
+  for (let i = 0; i < 30; i++) { if (window.claude?.use) return window.claude; await sleep(100); }
+  return null;
+}
+async function initBackend() {
+  const c = await getClaude();
+  if (!c) { S.backend = 'none'; refresh(); return; }
+  const use = n => Promise.resolve(c.use(n)).catch(() => null);
+  const [db, user, assets, downloads, sample] = await Promise.all([use('db'), use('user'), use('assets'), use('downloads'), use('sample')]);
+  Object.assign(S, { db, user, assets, downloads, sample });
+  if (!db) { S.backend = 'none'; refresh(); return; }
+  S.backend = 'ok';
+  if (user) {
+    try { const w = await user.can('data.write'); if (w === true || w === false) S.canWrite = w; } catch {}
+    try { const a = await user.canEdit(); if (a === true || a === false) S.isAdmin = a; } catch {}
+  }
+  subscribe();
+  refresh();
+}
+function subscribe() {
+  const timer = setTimeout(() => { if (!Object.values(S.ready).every(Boolean)) { S.slow = true; refresh(); } }, 10000);
+  const done = () => { if (Object.values(S.ready).every(Boolean)) { clearTimeout(timer); S.slow = false; } };
+  for (const col of ['movies', 'meals', 'trips']) {
+    S.db.collection(col).onSnapshot(snap => {
+      S[col] = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+      if (!snap.metadata.fromCache) S.ready[col] = true;
+      done(); scheduleRefresh();
+    }, err => { console.warn(col, err); S.ready[col] = true; done(); scheduleRefresh(); });
+  }
+  S.db.collection(INVEST_COL).onSnapshot(snap => {
+    S.invest = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+    if (!snap.metadata.fromCache) S.ready.invest = true;
+    done(); scheduleRefresh();
+  }, err => { console.warn('invest', err); S.ready.invest = true; done(); scheduleRefresh(); });
+  S.db.doc('city/meta').onSnapshot(d => {
+    S.meta = d.exists ? { ...d.data() } : {};
+    if (!d.metadata.fromCache) S.ready.meta = true;
+    done(); scheduleRefresh();
+  }, () => { S.ready.meta = true; done(); });
+}
+let refreshQueued = false;
+function scheduleRefresh() { if (refreshQueued) return; refreshQueued = true; requestAnimationFrame(() => { refreshQueued = false; refresh(); }); }
+
+function handleWriteError(e) {
+  console.error(e);
+  const code = e?.code;
+  if (code === 'invalid_argument' && S.canWrite !== true) { S.readOnly = true; refresh(); toast('你现在只能看。噜和蛋请在右上角齿轮「城市设置」里输入编辑密码登录。', 'err'); }
+  else if (code === 'quota_exceeded') toast('存储空间满了，删掉一些旧记录再试。', 'err');
+  else if (code === 'revoked') { S.readOnly = true; refresh(); toast('访问权限变了，刷新一下页面。', 'err'); }
+  else toast('没保存成功：' + (e?.message || code || '网络问题') + '。稍后再试一次。', 'err');
+}
+async function withRetry(fn) {
+  try { return await fn(); } catch (e) {
+    if (e?.code === 'unavailable') { await sleep(400 + Math.random() * 600); return fn(); }
+    throw e;
+  }
+}
+async function saveDoc(col, id, data, original) {
+  const ref = id ? S.db.collection(col).doc(id) : S.db.collection(col).doc();
+  const now = Date.now();
+  const body = JSON.parse(JSON.stringify({ ...data, createdAt: original?.createdAt || now, updatedAt: now }));
+  await withRetry(() => ref.set(body));
+  return ref.id;
+}
+async function deleteDoc(col, item, photoRefs = []) {
+  await withRetry(() => S.db.collection(col).doc(item.id).delete());
+  await deleteRefs(photoRefs);
+}
+async function saveMeta(patch) {
+  const next = { ...S.meta, ...patch };
+  await withRetry(() => S.db.doc('city/meta').set(JSON.parse(JSON.stringify(next))));
+  S.meta = next;
+}
+
+/* ---------- photo upload ---------- */
+async function compressImage(file) {
+  if (!/^image\/(jpeg|png|webp|heic|heif)$/i.test(file.type) && file.type !== '') return file;
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const max = 1800, r = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * r); c.height = Math.round(bmp.height * r);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(res => c.toBlob(b => res(b), 'image/jpeg', 0.85));
+    return blob && blob.size < file.size * 1.2 ? blob : file;
+  } catch { return file; }
+}
+async function makeThumb(file, max = 480) {
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const r = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * r); c.height = Math.round(bmp.height * r);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const keepAlpha = /png|webp|gif/i.test(file.type);
+    return await new Promise(res => c.toBlob(b => res(b), keepAlpha ? 'image/png' : 'image/jpeg', 0.8));
+  } catch { return null; }
+}
+async function uploadPhoto(file) {
+  const keepAlpha = /png|webp|gif/i.test(file.type);
+  const blob = keepAlpha ? file : await compressImage(file);
+  const opts = blob.type ? undefined : { type: 'image/jpeg' };
+  const r = await S.assets.upload(blob, opts);
+  S.localUrls[r.id] = r.url;
+  let ref = r.id;
+  const tb = await makeThumb(file);
+  if (tb && tb.size < blob.size * 0.8) {
+    try { const t = await S.assets.upload(tb); S.localUrls[t.id] = t.url; ref = r.id + '|' + t.id; } catch {}
+  }
+  return ref;
+}
+function uploadErrorText(e, file) {
+  const c = e?.code;
+  if (c === 'unsupported_type') return `「${file.name}」的格式传不上去（比如 HEIC），请先转成 JPG 再试。`;
+  if (c === 'too_large') return `「${file.name}」太大了（超过 20MB）。`;
+  if (c === 'quota_or_state') return '照片存储空间满了，删掉一些不用的照片再试。';
+  if (c === 'rate_limited') return '传得太快啦，等几秒再试。';
+  return `「${file.name}」上传失败，再试一次。`;
+}
+// A photo strip field: returns controller {get(), uploadedNow, busy()}
+function mountPhotoField(container, ids = [], { max = 30, label = '添加照片' } = {}) {
+  const st = { ids: [...ids], busy: 0, uploadedNow: new Set() };
+  const inputId = 'pf-' + Math.random().toString(36).slice(2, 8);
+  const draw = () => {
+    container.dataset.ids = st.ids.join(',');
+    if (!S.assets) {
+      container.innerHTML = (st.ids.map((id, i) => `<div class="ph ${i === 0 && max > 1 ? 'first' : ''}">${imgTag(id)}</div>`).join('')) + `<div class="hint">登录以后才能上传照片${S.backend !== 'ok' ? '（现在没连上数据库）' : ''}。</div>`;
+      return;
+    }
+    container.innerHTML = st.ids.map((id, i) => `<div class="ph ${i === 0 && max > 1 ? 'first' : ''}" data-id="${esc(id)}">${imgTag(id)}
+        ${max > 1 && i > 0 ? `<button type="button" class="cover" title="设为封面" aria-label="设为封面">★</button>` : ''}
+        <button type="button" class="rm" title="移除" aria-label="移除这张照片">×</button></div>`).join('')
+      + Array.from({ length: st.busy }, () => `<div class="ph busy">上传中…</div>`).join('')
+      + (st.ids.length + st.busy < max ? `<label class="ph-add" for="${inputId}">＋<br>${label}</label><input id="${inputId}" class="visually-hidden" type="file" accept="image/*" ${max > 1 ? 'multiple' : ''}>` : '');
+  };
+  container.classList.add('photos');
+  container.addEventListener('click', e => {
+    const ph = e.target.closest('.ph[data-id]'); if (!ph) return;
+    const id = ph.dataset.id;
+    if (e.target.closest('.rm')) { st.ids = st.ids.filter(x => x !== id); draw(); }
+    else if (e.target.closest('.cover')) { st.ids = [id, ...st.ids.filter(x => x !== id)]; draw(); }
+    else openLightbox(st.ids, st.ids.indexOf(id));
+  });
+  container.addEventListener('change', async e => {
+    const inp = e.target; if (inp.type !== 'file') return;
+    const files = Array.from(inp.files || []).slice(0, max - st.ids.length);
+    st.busy += files.length; draw();
+    for (const f of files) {
+      try { const id = await uploadPhoto(f); st.ids.push(id); st.uploadedNow.add(id); container.dispatchEvent(new Event('change', { bubbles: true })); }
+      catch (err) { console.error(err); toast(uploadErrorText(err, f), 'err'); }
+      st.busy--; draw();
+    }
+  });
+  draw();
+  return {
+    get: () => [...st.ids], busy: () => st.busy > 0,
+    // assets uploaded in this form but not kept → delete; original assets removed → delete
+    async cleanup(saved, original = []) {
+      const keep = new Set(saved ? st.ids : original);
+      const cand = saved ? [...original, ...st.uploadedNow] : [...st.uploadedNow];
+      await deleteRefs(cand.filter(id => !keep.has(id)));
+    },
+    uploaded: () => [...st.uploadedNow],
+  };
+}
+
+/* ---------- star input (delegated) ---------- */
+function starInputHTML(id, v = 0) {
+  return `<div class="star-input" id="${id}" data-value="${v || 0}" tabindex="0" role="slider" aria-label="评分（0 到 5 星）" aria-valuemin="0" aria-valuemax="5" aria-valuenow="${v || 0}">${starsHTML(v, 28)}<span class="star-val">${v ? (+v).toFixed(1) : '未评分'}</span></div>`;
+}
+function setStar(el, v) {
+  v = Math.max(0, Math.min(5, Math.round(v * 2) / 2));
+  el.dataset.value = v; el.setAttribute('aria-valuenow', v);
+  el.innerHTML = `${starsHTML(v, 28)}<span class="star-val">${v ? v.toFixed(1) : '未评分'}</span>`;
+}
+document.addEventListener('click', e => {
+  const si = e.target.closest('.star-input'); if (!si) return;
+  const st = $('.stars', si); const r = st.getBoundingClientRect();
+  if (e.clientX > r.right + 4) { setStar(si, 0); return; }
+  let v = Math.ceil(((e.clientX - r.left) / r.width) * 10) / 2;
+  v = Math.max(0.5, Math.min(5, v));
+  setStar(si, +si.dataset.value === v ? 0 : v);
+});
+document.addEventListener('keydown', e => {
+  const si = e.target.closest?.('.star-input'); if (!si) return;
+  const v = +si.dataset.value || 0;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); setStar(si, v + 0.5); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); setStar(si, v - 0.5); }
+  if (e.key === '0' || e.key === 'Backspace') setStar(si, 0);
+});
+
+/* ---------- form helpers ---------- */
+function seg(name, options, value) {
+  return `<div class="seg" role="radiogroup">${options.map(([v, l]) => `<label><input type="radio" name="${name}" value="${v}" ${v === value ? 'checked' : ''}><span>${l}</span></label>`).join('')}</div>`;
+}
+const getSeg = (root, name) => $(`input[name="${name}"]:checked`, root)?.value;
+const val = (root, sel) => ($(sel, root)?.value || '').trim();
+function suggestHTML(forId, list, current) {
+  const cur = new Set(splitTags(current));
+  return `<div class="suggest" data-for="${forId}">${list.map(t => `<button type="button" class="${cur.has(t) ? 'on' : ''}" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div>`;
+}
+const splitTags = s => String(s || '').split(/[,，、\s]+/).map(x => x.trim()).filter(Boolean);
+document.addEventListener('click', e => {
+  const b = e.target.closest('.suggest button'); if (!b) return;
+  const box = b.closest('.suggest'); const inp = document.getElementById(box.dataset.for); if (!inp) return;
+  let tags = splitTags(inp.value); const t = b.dataset.tag;
+  tags = tags.includes(t) ? tags.filter(x => x !== t) : [...tags, t];
+  inp.value = tags.join('、'); b.classList.toggle('on', tags.includes(t));
+});
+function dualFields(prefix, d = {}, { long = false, shortPh = '一句话评价' } = {}) {
+  return `<div class="dual">${['lu', 'dan'].map(w => `<div class="dual-col ${w}">
+      <div class="dual-head">${avatar(w, 34)}<span>${WHO[w]}的评价</span></div>
+      ${starInputHTML(`${prefix}-${w}-stars`, d?.[w]?.stars || 0)}
+      <input id="${prefix}-${w}-short" type="text" maxlength="120" placeholder="${shortPh}" value="${esc(d?.[w]?.short || '')}" aria-label="${WHO[w]}的${shortPh}">
+      ${long ? `<textarea id="${prefix}-${w}-long" rows="4" placeholder="想多写点就写在这里…" aria-label="${WHO[w]}的影评">${esc(d?.[w]?.long || '')}</textarea>` : ''}
+    </div>`).join('')}</div>`;
+}
+function readDual(root, prefix, long = false) {
+  const o = {};
+  for (const w of ['lu', 'dan']) {
+    o[w] = { stars: +($('#' + prefix + '-' + w + '-stars', root)?.dataset.value || 0), short: val(root, `#${prefix}-${w}-short`) };
+    if (long) o[w].long = val(root, `#${prefix}-${w}-long`);
+  }
+  return o;
+}
+function fieldError(root, sel, msg) {
+  const el = $(sel, root); if (!el) return;
+  let er = el.parentElement.querySelector('.err');
+  if (!er) { er = document.createElement('div'); er.className = 'err'; el.parentElement.appendChild(er); }
+  er.textContent = msg; el.focus();
+}
+
+/* ---------- geo / maps ---------- */
+const GEO = {};
+function loadGeo(name) {
+  return GEO[name] ||= fetch(`geo/${name}.json`).then(r => { if (!r.ok) throw new Error('geo ' + r.status); return r.json(); }).catch(e => { delete GEO[name]; throw e; });
+}
+const VIEWS = {
+  sg: [[103.6, 1.2], [104.05, 1.475]], asia: [[92, -9], [146, 46]], world: [[-165, -50], [175, 72]],
+  eastasia: [[100, 18], [146, 46]],
+};
+const SG_LANDMARKS = [['NUS', 103.7764, 1.2966], ['Orchard', 103.8318, 1.3048], ['Marina Bay', 103.8607, 1.2834], ['Chinatown', 103.8443, 1.2836], ['Bugis', 103.8559, 1.3006], ['Sentosa', 103.8303, 1.2494], ['Changi Airport', 103.9915, 1.3644], ['Jurong East', 103.7422, 1.3331], ['Woodlands', 103.789, 1.4382], ['Tampines', 103.9568, 1.3496], ['Bishan', 103.8484, 1.3508], ['Holland V', 103.7958, 1.3112]];
+const PIN_PATH = 'M0 0 C-2.5 -5 -9 -9.5 -9 -16 A9 9 0 1 1 9 -16 C9 -9.5 2.5 -5 0 0 Z';
+
+const EXT_LAYERS = [{ name: 'urban', minK: 9 }, { name: 'lakes', minK: 2.5 }, { name: 'rivers', minK: 2.5 }, { name: 'roads', minK: 9 }];
+const LB = new Map(); let lbSeq = 0;
+function lbKey(refs) { const k = 'lb' + (++lbSeq); LB.set(k, refs); return k; }
+class GeoMap {
+  constructor(el, o = {}) {
+    this.el = el;
+    this.o = Object.assign({ height: 380, initial: 'sg', views: [['sg', '新加坡'], ['asia', '亚洲'], ['world', '世界']], pickable: false, provinces: false, labelK: 60, photoK: Infinity, legend: '', flat: false, onPick: null, hint: '' }, o);
+    this.pins = []; this.routes = []; this.visitedPts = null; this.k = 1; this.ready = false; this.pickPt = null;
+    el.classList.add('geomap'); if (this.o.flat) el.classList.add('flat');
+    el.style.setProperty('--map-h', this.o.height + 'px');
+    el.innerHTML = `<div class="map-loading">地图加载中…</div>`;
+    this.readyP = this._init();
+  }
+  async _init() {
+    try {
+      const [world, detail, sg, prov, rail] = await Promise.all([loadGeo('world'), loadGeo('detail'), loadGeo('sg'), this.o.provinces ? loadGeo('provinces').catch(() => null) : null, loadGeo('sgrail').catch(() => null)]);
+      if (typeof d3 === 'undefined') throw new Error('d3 missing');
+      this._build(world, detail, sg, prov, rail);
+    } catch (e) { console.error(e); this.el.innerHTML = `<div class="map-loading">地图没加载出来，刷新页面试试。</div>`; }
+  }
+  _build(world, detail, sg, prov, rail) {
+    const el = this.el; el.innerHTML = '';
+    const W = this.W = Math.max(280, el.clientWidth || 600), H = this.H = this.o.height;
+    const proj = this.proj = d3.geoMercator().scale(1000 / (2 * Math.PI)).translate([500, 330]).center([0, 0]);
+    const path = this.path = d3.geoPath(proj);
+    const svg = this.svg = d3.select(el).append('svg').attr('class', 'map-svg' + (this.o.pickable ? ' pickable' : '')).attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', '地图');
+    const g = this.g = svg.append('g');
+    const detailCodes = new Set(detail.features.map(f => f.properties.a)); detailCodes.add('SGP');
+    const land = g.append('g').attr('class', 'land');
+    const sgCountry = sg.features.find(f => f.properties.k === 'country');
+    const countries = [...world.features.filter(f => !detailCodes.has(f.properties.a)), ...detail.features.filter(f => f.properties.a !== 'SGP'), { ...sgCountry, properties: { a: 'SGP', n: '新加坡', sg: true } }];
+    this.countryPaths = land.selectAll('path').data(countries).join('path').attr('class', d => 'country' + (d.properties.sg ? ' sg' : '')).attr('d', path);
+    this.provPaths = prov ? g.append('g').attr('class', 'prov').selectAll('path').data(prov.features).join('path').attr('d', path) : null;
+    const extG = g.append('g').attr('class', 'ext');
+    this.ext = {};
+    for (const L of EXT_LAYERS) this.ext[L.name] = { g: extG.append('g').attr('class', 'ext-' + L.name), drawn: new Set(), cells: new Set() };
+    const pas = sg.features.filter(f => f.properties.k === 'pa');
+    g.append('g').attr('class', 'sg-pa').selectAll('path').data(pas).join('path').attr('d', path);
+    let stations = [];
+    if (rail) {
+      g.append('g').attr('class', 'rail').selectAll('path').data(rail.lines).join('path')
+        .attr('d', d => 'M' + d.pts.map(p => proj(p).join(',')).join('L')).style('stroke', d => d.c);
+      stations = rail.stations.map(st => ({ t: st.n, zh: st.zh, p: proj(st.p), cls: 'lbl-st' }));
+    }
+    const labels = [
+      ...stations,
+      ...SG_LANDMARKS.map(([t, lng, lat]) => ({ t, p: proj([lng, lat]), cls: 'lbl-lm' })),
+      ...pas.map(f => ({ t: f.properties.n, p: path.centroid(f), cls: 'lbl-pa' })),
+    ];
+    this.labelSel = g.append('g').attr('class', 'labels').selectAll('g').data(labels).join('g').attr('class', d => d.cls);
+    this.labelSel.filter(d => d.cls === 'lbl-lm').append('circle').attr('r', 2.4);
+    this.labelSel.filter(d => d.cls === 'lbl-st').append('circle').attr('r', 3.2);
+    this.labelSel.append('text').attr('y', d => d.cls === 'lbl-pa' ? 4 : -7).text(d => d.t);
+    this.labelSel.filter(d => d.zh).append('title').text(d => `${d.zh} ${d.t}`);
+    this.routeG = g.append('g').attr('class', 'routes');
+    this.pinG = g.append('g').attr('class', 'pins');
+    this.pickG = g.append('g');
+    // controls
+    const ctrl = document.createElement('div'); ctrl.className = 'map-ctrl';
+    ctrl.innerHTML = `<button type="button" aria-label="放大">＋</button><button type="button" aria-label="缩小">－</button><button type="button" class="map-i" aria-label="地图数据来源">i</button>`;
+    const [zin, zout, info] = ctrl.children;
+    const attr = document.createElement('div'); attr.className = 'map-attr'; attr.hidden = true;
+    attr.textContent = '地图数据：Natural Earth。新加坡：URA Master Plan 2014、LTA DataMall，依 Singapore Open Data Licence 使用。';
+    el.appendChild(attr);
+    info.onclick = () => { attr.hidden = !attr.hidden; };
+    zin.onclick = () => this.svg.transition().duration(250).call(this.zoom.scaleBy, 2);
+    zout.onclick = () => this.svg.transition().duration(250).call(this.zoom.scaleBy, 0.5);
+    el.appendChild(ctrl);
+    if (this.o.views?.length) {
+      const vw = document.createElement('div'); vw.className = 'map-views';
+      vw.innerHTML = this.o.views.map(([k, l]) => `<button type="button" data-v="${k}">${l}</button>`).join('');
+      vw.addEventListener('click', e => { const b = e.target.closest('button'); if (b) this.view(b.dataset.v); });
+      el.appendChild(vw);
+    }
+    if (this.o.legend) { const lg = document.createElement('div'); lg.className = 'map-legend'; lg.innerHTML = this.o.legend; el.appendChild(lg); }
+    else if (this.o.hint) { const h = document.createElement('div'); h.className = 'map-hint'; h.textContent = this.o.hint; el.appendChild(h); }
+    this.pop = document.createElement('div'); this.pop.className = 'map-pop'; this.pop.hidden = true; el.appendChild(this.pop);
+    this.pop.addEventListener('click', e => { if (e.target.closest('.x')) this.hidePop(); });
+    // zoom
+    this.active = false;
+    el.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') this.active = true; });
+    el.addEventListener('mouseleave', () => { this.active = false; });
+    const nudge = msg => { if (!this.hintEl) { this.hintEl = document.createElement('div'); this.hintEl.className = 'map-nudge'; el.appendChild(this.hintEl); } this.hintEl.textContent = msg; this.hintEl.classList.add('on'); clearTimeout(this._nt); this._nt = setTimeout(() => this.hintEl.classList.remove('on'), 1400); };
+    el.addEventListener('wheel', e => { if (!(e.ctrlKey || e.metaKey || this.active)) nudge('先点一下地图，或按住 Ctrl / ⌘ 再滚动来缩放'); }, { passive: true });
+    el.addEventListener('touchmove', e => { if (e.touches.length === 1 && !this.o.pickable) nudge('用两根手指移动和缩放地图'); }, { passive: true });
+    this.zoom = d3.zoom().scaleExtent([0.25, 30000])
+      .filter(ev => {
+        if (ev.type === 'wheel') return ev.ctrlKey || ev.metaKey || this.active;
+        if (ev.type.startsWith('touch')) return this.o.pickable || ev.touches.length >= 2;
+        return !ev.ctrlKey && !ev.button;
+      })
+      .on('start', () => this.hidePop()).on('zoom', ev => this._onZoom(ev.transform)).on('end', () => this._queueExtras());
+    svg.call(this.zoom).on('dblclick.zoom', null);
+    svg.on('click', ev => {
+      if (ev.defaultPrevented) return;
+      if (!this.o.pickable) { this.hidePop(); return; }
+      const [x, y] = d3.pointer(ev, g.node());
+      const [lng, lat] = proj.invert([x, y]);
+      this.setPick(lng, lat); this.o.onPick?.(lng, lat);
+    });
+    this.ro = new ResizeObserver(() => {
+      const w = Math.max(280, el.clientWidth || 600); if (Math.abs(w - this.W) < 2) return;
+      this.W = w; svg.attr('viewBox', `0 0 ${w} ${this.H}`);
+    });
+    this.ro.observe(el);
+    this.ready = true;
+    this._drawRoutes(); this._drawPins(); this._applyVisited(); this._drawPick();
+    const init = this.o.initial;
+    if (init === 'pins' && this.pins.length) this.fitPins(false);
+    else if (init === 'pick' && this.pickPt) { const p = this.pickPt; this.flyTo(p, isSG(p[0], p[1]) ? 900 : Math.max(20, this.W * 0.09), false); }
+    else this.view(VIEWS[init] ? init : (this.o.fallback || 'sg'), false);
+  }
+  _onZoom(t) {
+    this.t = t; this.k = t.k;
+    this.g.attr('transform', t);
+    const s = `scale(${1 / t.k})`;
+    this.labelSel.attr('transform', d => `translate(${d.p[0]},${d.p[1]}) ${s}`);
+    this.pinG.selectAll('g.pin').attr('transform', d => `translate(${d._p[0]},${d._p[1]}) ${s}`);
+    this.pickG.selectAll('g').attr('transform', d => `translate(${d[0]},${d[1]}) ${s}`);
+    this.svg.classed('z-prov', t.k > 3).classed('z-riv', t.k > 2.5).classed('z-city', t.k > 9)
+      .classed('z-lm', t.k > 300).classed('z-pa', t.k > 1100).classed('z-st', t.k > 3800)
+      .classed('z-pinlbl', t.k > this.o.labelK).classed('z-photo', t.k > this.o.photoK);
+  }
+  _queueExtras() { clearTimeout(this._extT); this._extT = setTimeout(() => this._loadExtras(), 150); }
+  async _loadExtras() {
+    let idx; try { idx = await loadGeo('x/index'); } catch { return; }
+    if (!this.t) return;
+    const t = this.t, k = t.k, C = idx.cell;
+    const [x0, y0] = t.invert([0, 0]), [x1, y1] = t.invert([this.W, this.H]);
+    const [w, n] = this.proj.invert([x0, y0]), [e, s] = this.proj.invert([x1, y1]);
+    for (const L of EXT_LAYERS) {
+      if (k < L.minK) continue;
+      const st = this.ext[L.name], have = new Set(idx.layers[L.name] || []);
+      const cx0 = Math.floor(Math.max(-180, w) / C), cx1 = Math.floor(Math.min(179.99, e) / C);
+      const cy0 = Math.floor(Math.max(-85, s) / C), cy1 = Math.floor(Math.min(85, n) / C);
+      if ((cx1 - cx0 + 1) * (cy1 - cy0 + 1) > 12) continue;
+      for (let cx = cx0; cx <= cx1; cx++) for (let cy = cy0; cy <= cy1; cy++) {
+        const key = `${cx}_${cy}`; if (!have.has(key) || st.cells.has(key)) continue;
+        st.cells.add(key);
+        loadGeo(`x/${L.name}-${key}`).then(fc => {
+          const fs = fc.features.filter(f => !st.drawn.has(f.properties.i));
+          fs.forEach(f => st.drawn.add(f.properties.i));
+          st.g.selectAll(null).data(fs).enter().append('path').attr('d', this.path).attr('class', d => d.properties.m ? 'major' : null);
+        }).catch(() => st.cells.delete(key));
+      }
+    }
+  }
+  setPins(pins) { this.pins = pins; if (this.ready) this._drawPins(); }
+  _drawPins() {
+    const s = `scale(${1 / this.k})`;
+    for (const d of this.pins) d._p = this.proj([d.lng, d.lat]);
+    const sel = this.pinG.selectAll('g.pin').data(this.pins.slice().sort((a, b) => a.lat < b.lat ? 1 : -1), d => d.key).join(enter => {
+      const gp = enter.append('g').attr('class', 'pin').attr('tabindex', 0).attr('role', 'button');
+      const std = gp.append('g').attr('class', 'pin-std');
+      std.append('path').attr('d', PIN_PATH); std.append('circle').attr('cy', -16).attr('r', 3.6);
+      gp.append('text').attr('class', 'pin-lbl').attr('x', 12).attr('y', -12);
+      return gp;
+    });
+    sel.attr('data-kind', d => d.kind || '').style('--pin', d => d.color).attr('aria-label', d => d.label)
+      .classed('has-photo', d => !!d.photo)
+      .attr('transform', d => `translate(${d._p[0]},${d._p[1]}) ${s}`);
+    sel.each(function (d) {
+      const ph = d.photo || '';
+      if (this.__ph === ph) return;
+      this.__ph = ph;
+      const g = d3.select(this); g.select('.pin-photo').remove();
+      if (!ph) return;
+      const pg = g.insert('g', 'text').attr('class', 'pin-photo');
+      pg.append('path').attr('class', 'ph-tail').attr('d', 'M-7 -9 L0 0 L7 -9 Z');
+      pg.append('circle').attr('class', 'ph-ring').attr('cy', -30).attr('r', 21);
+      pg.append('image').attr('href', imgUrl(ph, true)).attr('x', -18).attr('y', -48).attr('width', 36).attr('height', 36)
+        .attr('preserveAspectRatio', 'xMidYMid slice').attr('clip-path', 'url(#clip-circle)');
+      if (d.num) { pg.append('circle').attr('class', 'ph-num').attr('cx', 15).attr('cy', -46).attr('r', 8); pg.append('text').attr('class', 'ph-numt').attr('x', 15).attr('y', -42.5).text(d.num); }
+    });
+    sel.select('text.pin-lbl').text(d => d.label);
+    sel.on('click', (ev, d) => { ev.stopPropagation(); this.showPop(d); })
+      .on('keydown', (ev, d) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); this.showPop(d); } });
+  }
+  setRoutes(routes) { this.routes = routes; if (this.ready) this._drawRoutes(); }
+  _drawRoutes() {
+    this.routeG.selectAll('path').data(this.routes.filter(r => r.pts.length > 1), d => d.key).join('path')
+      .attr('class', d => 'route ' + (d.kind || ''))
+      .attr('d', d => 'M' + d.pts.map(p => this.proj(p).join(',')).join('L'));
+  }
+  showPop(d) {
+    if (!d.popup) return;
+    const r = this.svg.node().getBoundingClientRect(); const sx = r.width / this.W;
+    const [x, y] = this.t.apply(d._p);
+    this.pop.innerHTML = `<button type="button" class="x" aria-label="关闭">×</button>${d.popup}`;
+    this.pop.hidden = false;
+    const left = Math.max(120, Math.min(r.width - 120, x * sx));
+    const lift = (d.photo && this.svg.classed('z-photo')) ? 52 : 30;
+    this.pop.style.left = left + 'px'; this.pop.style.top = Math.max(170, y * sx - lift + 30) + 'px';
+  }
+  hidePop() { if (this.pop) this.pop.hidden = true; }
+  setVisited(pts) { this.visitedPts = pts; if (this.ready) this._applyVisited(); }
+  _applyVisited() {
+    if (!this.visitedPts) return;
+    const pts = this.visitedPts;
+    const has = f => { const [[w, s], [e, n]] = d3.geoBounds(f); return pts.some(p => p[0] >= w - .01 && p[0] <= e + .01 && p[1] >= s - .01 && p[1] <= n + .01 && d3.geoContains(f, p)); };
+    this.countryPaths.classed('visited', f => !f.properties.sg && has(f) || (f.properties.sg && pts.some(p => d3.geoContains(f, p))));
+    this.provPaths?.classed('visited', has);
+  }
+  setPick(lng, lat) { this.pickPt = (lng == null) ? null : [lng, lat]; if (this.ready) this._drawPick(); }
+  _drawPick() {
+    const pts = this.pickPt ? [this.proj(this.pickPt)] : [];
+    const s = `scale(${1 / this.k})`;
+    this.pickG.selectAll('g').data(pts).join(enter => { const gp = enter.append('g').attr('class', 'pick'); gp.append('path').attr('d', PIN_PATH); gp.append('circle').attr('cy', -16).attr('r', 3.6); return gp; })
+      .attr('transform', d => `translate(${d[0]},${d[1]}) ${s}`);
+  }
+  _go(t, animate) { (animate ? this.svg.transition().duration(700) : this.svg).call(this.zoom.transform, t); }
+  fitBounds([[w, s], [e, n]], animate = true) {
+    const [x0, y1] = this.proj([w, s]), [x1, y0] = this.proj([e, n]);
+    const k = Math.min(this.W / Math.max(1e-6, x1 - x0), this.H / Math.max(1e-6, y1 - y0)) * 0.86;
+    this._go(d3.zoomIdentity.translate(this.W / 2 - k * (x0 + x1) / 2, this.H / 2 - k * (y0 + y1) / 2 + 10).scale(k), animate);
+  }
+  flyTo([lng, lat], k = 600, animate = true) {
+    const [x, y] = this.proj([lng, lat]);
+    this._go(d3.zoomIdentity.translate(this.W / 2 - k * x, this.H / 2 - k * y + 20).scale(k), animate);
+  }
+  view(name, animate = true) {
+    if (name === 'pins') return this.fitPins(animate);
+    if (VIEWS[name]) this.fitBounds(VIEWS[name], animate);
+  }
+  fitPins(animate = true) {
+    if (!this.pins.length) return this.view(this.o.fallback || 'sg', animate);
+    let w = 180, e = -180, s = 90, n = -90;
+    for (const p of this.pins) { w = Math.min(w, p.lng); e = Math.max(e, p.lng); s = Math.min(s, p.lat); n = Math.max(n, p.lat); }
+    const inSG = this.pins.every(p => isSG(p.lng, p.lat));
+    const minSpan = inSG ? 0.06 : (this.o.minSpan || 3);
+    const cx = (w + e) / 2, cy = (s + n) / 2;
+    if (e - w < minSpan) { w = cx - minSpan / 2; e = cx + minSpan / 2; }
+    if (n - s < minSpan * 0.6) { s = cy - minSpan * 0.3; n = cy + minSpan * 0.3; }
+    const pad = Math.max((e - w) * 0.1, (n - s) * 0.1);
+    this.fitBounds([[w - pad, s - pad], [e + pad, n + pad * 1.8]], animate);
+  }
+  destroy() { this.ro?.disconnect(); clearTimeout(this._extT); }
+}
+function makeMap(el, o) { return (window.google?.maps?.importLibrary && typeof GMap !== 'undefined') ? new GMap(el, o) : new GeoMap(el, o); }
+const isSG = (lng, lat) => lng > 103.5 && lng < 104.2 && lat > 1.1 && lat < 1.55;
+function gmapsOpen(loc) { if (!loc) return ''; return safeUrl(loc.gmaps) || `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`; }
+function gmapsNav(loc) { return loc ? `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}` : ''; }
+function gmapsButtons(loc, small = true) {
+  if (!loc || loc.lat == null) return loc?.gmaps && safeUrl(loc.gmaps) ? `<a class="btn ${small ? 'small' : ''}" href="${esc(safeUrl(loc.gmaps))}" target="_blank" rel="noopener">在 Google 地图打开</a>` : '';
+  return `<a class="btn ${small ? 'small' : ''}" href="${esc(gmapsOpen(loc))}" target="_blank" rel="noopener">在 Google 地图打开</a><a class="btn ${small ? 'small' : ''} ghost" href="${esc(gmapsNav(loc))}" target="_blank" rel="noopener">导航过去</a>`;
+}
+
+/* where is a point? → "Queenstown · 新加坡" / "京都府 · 日本" */
+async function describePoint(lng, lat) {
+  try {
+    const [world, detail, sg, prov] = await Promise.all([loadGeo('world'), loadGeo('detail'), loadGeo('sg'), loadGeo('provinces').catch(() => null)]);
+    const pt = [lng, lat];
+    const sgc = sg.features.find(f => f.properties.k === 'country');
+    if (lng > 103.5 && lng < 104.2 && lat > 1.1 && lat < 1.55) {
+      const pa = sg.features.find(f => f.properties.k === 'pa' && d3.geoContains(f, pt));
+      if (pa || d3.geoContains(sgc, pt)) return { area: pa ? `${pa.properties.n} · 新加坡` : '新加坡', country: '新加坡' };
+    }
+    const quick = f => { const [[w, s], [e, n]] = d3.geoBounds(f); return lng >= w && lng <= e && lat >= s && lat <= n; };
+    const c = [...detail.features, ...world.features].find(f => quick(f) && d3.geoContains(f, pt));
+    const country = c?.properties.n || '';
+    const p = prov?.features.find(f => quick(f) && d3.geoContains(f, pt));
+    return { area: [p?.properties.n, country].filter(Boolean).join(' · '), country };
+  } catch { return { area: '', country: '' }; }
+}
+
+/* parse a Google Maps link or typed coordinates */
+function parseLocText(text) {
+  const t = String(text || '').trim(); if (!t) return null;
+  const out = { gmaps: /^https?:\/\//i.test(t) ? t : '' };
+  let m = t.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/) || t.match(/[?&](?:q|query|ll|destination|center|daddr)=(?:loc:)?(-?\d+(?:\.\d+)?)(?:,|%2C)\s*\+?(-?\d+(?:\.\d+)?)/i) || t.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/) || t.match(/^\(?\s*(-?\d+(?:\.\d+)?)\s*[,，\s]\s*(-?\d+(?:\.\d+)?)\s*\)?$/);
+  if (m) { out.lat = +m[1]; out.lng = +m[2]; }
+  else {
+    const d = t.match(/(\d+(?:\.\d+)?)°\s*(\d+(?:\.\d+)?)['′]\s*(\d+(?:\.\d+)?)["″]?\s*([NS])[\s,]+(\d+(?:\.\d+)?)°\s*(\d+(?:\.\d+)?)['′]\s*(\d+(?:\.\d+)?)["″]?\s*([EW])/i);
+    if (d) { out.lat = (+d[1] + d[2] / 60 + d[3] / 3600) * (/s/i.test(d[4]) ? -1 : 1); out.lng = (+d[5] + d[6] / 60 + d[7] / 3600) * (/w/i.test(d[8]) ? -1 : 1); }
+  }
+  const pn = t.match(/\/maps\/place\/([^/@?]+)/);
+  if (pn) { try { out.name = decodeURIComponent(pn[1].replace(/\+/g, ' ')); } catch {} }
+  if (out.lat != null && (Math.abs(out.lat) > 90 || Math.abs(out.lng) > 180)) { delete out.lat; delete out.lng; }
+  if (out.lat == null && !out.gmaps) return null;
+  return out;
+}
+
+/* gazetteer search (Natural Earth populated places + Singapore planning areas) */
+let SG_PLACES = null;
+async function searchPlaces(q) {
+  q = q.trim().toLowerCase(); if (!q) return [];
+  const rows = await loadGeo('places');
+  if (!SG_PLACES) { const sg = await loadGeo('sg'); SG_PLACES = sg.features.filter(f => f.properties.k === 'pa').map(f => { const [lng, lat] = d3.geoCentroid(f); return [f.properties.n, f.properties.n, '新加坡', +lat.toFixed(4), +lng.toFixed(4), '']; }); }
+  const res = [];
+  for (const r of [...SG_PLACES, ...rows]) {
+    const names = [r[0], r[1], r[5] || ''].map(x => x.toLowerCase());
+    let score = 9;
+    if (names.some(n => n === q)) score = 0; else if (names.some(n => n.startsWith(q))) score = 1; else if (names.some(n => n.includes(q))) score = 2;
+    if (score < 9) { res.push([score, res.length, r]); if (res.length >= 60) break; }
+  }
+  return res.sort((a, b) => a[0] - b[0] || a[1] - b[1]).slice(0, 10).map(x => x[2]);
+}
+
+async function claudeLocate(query, hint) { return window.google?.maps?.importLibrary ? googleLocate(query, hint) : window.LBD_LOCATE(query); }
+/* Location picker → controller {get()} ; value {lat,lng,area,country,gmaps,est?} */
+function mountLocationPicker(container, initial, { view = 'sg', onName = null, getName = null, hint = null } = {}) {
+  let loc = initial && (initial.lat != null || initial.gmaps) ? { ...initial } : null;
+  const uid = Math.random().toString(36).slice(2, 7);
+  container.classList.add('lp');
+  container.innerHTML = `
+    <div class="lp-row"><div class="lp-search"><input type="text" id="lps-${uid}" placeholder="搜城市或新加坡的区，比如 京都 / Tanjong Pagar" autocomplete="off" aria-label="搜索地点"><div class="lp-results" hidden></div></div>
+      <button type="button" class="btn small lp-ai" ${S.sample ? '' : 'hidden'} title="输入景点或店名，在地图数据里搜它的位置">搜这个地点</button></div>
+    <input type="text" id="lpl-${uid}" placeholder="或者粘贴 Google 地图链接 / 坐标（如 1.2966, 103.7764）" aria-label="粘贴 Google 地图链接或坐标">
+    <div class="lp-map"></div>
+    <div class="lp-status"></div>
+    <div class="hint">景点和店铺：在上面输入名字，点「搜这个地点」（中文搜不到时试试英文或当地语言名字），或者直接在地图上点一下放钉子（用 Google 地图时，可以直接点地图上的店铺或景点图标）。Google 地图的短链接（maps.app.goo.gl）读不出坐标：在 Google 地图里长按那个地点，复制顶部出现的坐标贴进来就行，链接本身也会一起存下。</div>`;
+  const map = makeMap($('.lp-map', container), { height: 250, initial: loc?.lat != null ? 'pick' : view, fallback: view, pickable: true, flat: true, views: [['sg', '新加坡'], ['asia', '亚洲'], ['world', '世界']], onPick: (lng, lat) => setLoc({ lat: +lat.toFixed(5), lng: +lng.toFixed(5), gmaps: loc?.gmaps || '' }, false),
+    onPlace: p => { setLoc({ lat: +p.lat.toFixed(6), lng: +p.lng.toFixed(6), gmaps: p.gmaps || '' }, false); onName?.({ name: p.name, local: '' }); } });
+  if (loc?.lat != null) map.setPick(loc.lng, loc.lat);
+  const status = $('.lp-status', container);
+  const drawStatus = () => {
+    if (!loc) { status.className = 'lp-status none'; status.innerHTML = '还没选地点（可以不填）'; return; }
+    status.className = 'lp-status';
+    status.innerHTML = `<span>已选：<b>${esc(loc.area || '')}</b> ${loc.lat != null ? `<span class="num muted">(${loc.lat.toFixed(4)}, ${loc.lng.toFixed(4)})</span>` : '<span class="muted">（只有链接，没有坐标，不会出现在地图上）</span>'}</span>
+      ${loc.est ? `<span class="chip want">搜索结果 · 可信度${{ high: '高', medium: '中', low: '低' }[loc.est] || '中'}</span>` : ''}${loc.gmaps ? '<span class="chip">已存 Google 链接</span>' : ''}
+      ${loc.lat != null ? `<a class="btn small" href="${esc(gmapsOpen(loc))}" target="_blank" rel="noopener">在 Google 地图核对</a>` : ''}<button type="button" class="btn small ghost lp-clear">清除</button>`;
+  };
+  async function setLoc(next, fly = true) {
+    loc = next;
+    if (loc?.lat != null) {
+      map.setPick(loc.lng, loc.lat); if (fly) map.flyTo([loc.lng, loc.lat], isSG(loc.lng, loc.lat) ? 1400 : Math.max(20, (map.W || 600) * (loc.est ? 0.5 : 0.09)));
+      drawStatus();
+      const d = await describePoint(loc.lng, loc.lat);
+      if (loc && !next.keepArea) { loc.area = d.area || loc.area || ''; loc.country = d.country || loc.country || ''; }
+    } else map.setPick(null);
+    drawStatus();
+  }
+  status.addEventListener('click', e => { if (e.target.closest('.lp-clear')) { $('#lpl-' + uid, container).value = ''; setLoc(null); } });
+  // ask Claude for an approximate position of a named spot
+  const aiBtn = $('.lp-ai', container);
+  aiBtn?.addEventListener('click', async () => {
+    const q = ($('#lps-' + uid, container).value.trim() || getName?.() || '').trim();
+    if (!q) { toast('先在搜索框里输入景点或店名'); $('#lps-' + uid, container).focus(); return; }
+    aiBtn.disabled = true; const old = aiBtn.textContent; aiBtn.textContent = '正在搜…';
+    try {
+      const r = await claudeLocate(q, hint?.() || '');
+      if (!r || r.found === false || !isFinite(+r.lat) || !isFinite(+r.lng) || Math.abs(+r.lat) > 90 || Math.abs(+r.lng) > 180) {
+        toast((r?.reason || '没搜到这个地点') + '。也可以贴 Google 地图坐标，或者直接在地图上点。', 'err');
+      } else {
+        $('#lps-' + uid, container).value = '';
+        await setLoc({ lat: +(+r.lat).toFixed(5), lng: +(+r.lng).toFixed(5), gmaps: r.gmaps || loc?.gmaps || '', est: ['high', 'medium', 'low'].includes(r.confidence) ? r.confidence : 'medium' });
+        onName?.({ name: String(r.name_zh || q), local: String(r.name_local || '') });
+        toast('找到了，建议点「在 Google 地图核对」看一眼位置对不对');
+      }
+    } catch (e) {
+      if (e?.code === 'not_granted' || e?.code === 'sampling_disabled') { aiBtn.hidden = true; toast('地点搜索暂时用不了。', 'err'); }
+      else if (e?.code === 'rate_limited') toast('问得太频繁了，过一会儿再试。', 'err');
+      else if (e?.code !== 'cancelled') toast(e?.message || '这次没搜成，再点一次试试。', 'err');
+    } finally { aiBtn.disabled = false; aiBtn.textContent = old; }
+  });
+  // search
+  const sIn = $('#lps-' + uid, container), sRes = $('.lp-results', container);
+  let sTimer;
+  sIn.addEventListener('input', () => {
+    clearTimeout(sTimer);
+    sTimer = setTimeout(async () => {
+      let rows = []; try { rows = await searchPlaces(sIn.value); } catch {}
+      if (!rows.length) { sRes.hidden = !sIn.value.trim(); sRes.innerHTML = `<div class="hint" style="padding:8px 12px">没找到。店铺请用 Google 地图链接或坐标，或者在地图上点。</div>`; return; }
+      sRes.hidden = false;
+      sRes.innerHTML = rows.map((r, i) => `<button type="button" data-i="${i}"><span>${esc(r[0])}${r[5] ? ` <span class="muted">${esc(r[5])}</span>` : (r[1] !== r[0] ? ` <span class="muted">${esc(r[1])}</span>` : '')}</span><span class="muted tiny">${esc(r[2])}</span></button>`).join('');
+      sRes._rows = rows;
+    }, 120);
+  });
+  sRes.addEventListener('click', e => {
+    const b = e.target.closest('button[data-i]'); if (!b) return;
+    const r = sRes._rows[+b.dataset.i];
+    sRes.hidden = true; sIn.value = '';
+    setLoc({ lat: r[3], lng: r[4], gmaps: loc?.gmaps || '' });
+    onName?.({ name: r[0], local: r[5] || '' });
+  });
+  sIn.addEventListener('blur', () => setTimeout(() => { sRes.hidden = true; }, 200));
+  // paste link / coords
+  const lIn = $('#lpl-' + uid, container);
+  const tryParse = () => {
+    const p = parseLocText(lIn.value); if (!p) { if (lIn.value.trim()) toast('没认出坐标。可以贴完整的 Google 地图链接，或「纬度, 经度」。', 'err'); return; }
+    if (p.lat != null) setLoc({ lat: +p.lat.toFixed(5), lng: +p.lng.toFixed(5), gmaps: p.gmaps || loc?.gmaps || '' });
+    else { loc = { ...(loc || {}), gmaps: p.gmaps }; if (loc.lat == null) loc.area = loc.area || '仅链接'; drawStatus(); toast('链接存下了。想让它出现在地图上，再贴一下坐标或在地图上点一下。'); }
+    if (p.name) onName?.({ name: p.name, local: '' });
+  };
+  lIn.addEventListener('change', tryParse);
+  lIn.addEventListener('paste', () => setTimeout(tryParse, 0));
+  if (initial?.gmaps) lIn.value = initial.gmaps;
+  drawStatus();
+  return { get: () => loc ? JSON.parse(JSON.stringify(loc)) : null, map };
+}
+
+/* ---------- routing / rendering ---------- */
+const INVEST_COL = 'private/invest/items';   // db rule: only editors (admin) can read/write under "private"
+const ROUTES = ['home', 'cinema', 'canteen', 'travel', 'invest'];
+let currentRoute = null;
+function route() { const h = location.hash.replace('#', ''); return ROUTES.includes(h) ? h : 'home'; }
+window.addEventListener('hashchange', () => { mountView(); window.scrollTo(0, 0); });
+
+function refresh() {
+  document.body.classList.toggle('can-edit', canEdit());
+  document.body.classList.toggle('no-admin', S.isAdmin === false);
+  const b = $('#banner');
+  let msg = '';
+  if (S.backend === 'none') msg = '现在连不上服务器，内容暂时显示不出来。刷新一下试试。';
+  else if (S.slow) msg = '数据还没加载出来，网络可能有点慢……如果一直这样，刷新一下页面。';
+  else if (S.backend === 'ok' && !canEdit()) msg = '';
+  b.hidden = !msg; b.textContent = msg;
+  $('#brand-mascots').innerHTML = avatar('lu', 40) + avatar('dan', 40);
+  if (currentRoute !== route()) mountView(); else VIEW[currentRoute].update?.();
+}
+function mountView() {
+  const r = route();
+  if (currentRoute && VIEW[currentRoute]?.map) { VIEW[currentRoute].map.destroy(); VIEW[currentRoute].map = null; }
+  currentRoute = r;
+  $$('.nav a, .bottom-nav a').forEach(a => { if (a.dataset.d === r) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  const titles = { home: '噜包蛋之城', cinema: '噜蛋影院 · 噜包蛋之城', canteen: '噜蛋食堂 · 噜包蛋之城', travel: '噜蛋旅行社 · 噜包蛋之城', invest: '噜蛋投资部 · 噜包蛋之城' };
+  document.title = titles[r];
+  const v = $('#view'); v.innerHTML = '';
+  VIEW[r].mount(v); VIEW[r].update?.();
+}
+$$('.bn-ic').forEach(s => { s.innerHTML = ICONS[s.dataset.ic](26); });
+
+function emptyState(title, text, btn = '') {
+  return `<div class="empty card"><div class="pair">${avatar('lu', 70)}${avatar('dan', 70)}</div><h3>${title}</h3><div>${text}</div>${btn}</div>`;
+}
+function loadingOr(col, html) { return (S.backend === 'ok' && !S.ready[col]) ? `<div class="empty"><div class="pair">${avatar('lu', 60)}${avatar('dan', 60)}</div><div>正在搬运数据…</div></div>` : html; }
+
+/* ---------- HOME ---------- */
+function daysTogether() {
+  const s = S.meta?.since; if (!s) return null;
+  const [y, m, d] = s.split('-').map(Number); const start = new Date(y, m - 1, d); const now = new Date();
+  const t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.floor((t0 - start) / 86400000) + 1;
+}
+function movieThumb(mv, size = 52) { return mv.poster ? imgTag(mv.poster, mv.title) : iconCinema(size * 0.8); }
+function feedItems() {
+  const items = [];
+  for (const m of S.movies) items.push({ type: 'movie', id: m.id, ts: m.createdAt || 0, title: (m.status === 'want' ? '想看：' : '') + `《${m.title}》`, sub: m.status === 'want' ? '加入了想看清单' : [m.where === 'cinema' ? '在电影院' : m.where === 'home' ? '在家' : '', avgStars(m) ? `平均 ${avgStars(m).toFixed(1)} 星` : ''].filter(Boolean).join(' · '), date: m.date, thumb: movieThumb(m), d: 'cinema' });
+  for (const m of S.meals) items.push({ type: 'meal', id: m.id, ts: m.createdAt || 0, title: (m.status === 'want' ? '想吃：' : '') + m.name, sub: m.status === 'want' ? ['加入了想吃清单', m.loc?.area].filter(Boolean).join(' · ') : [m.kind === 'home' ? '自己做' : '出去吃', m.loc?.area, fmtMoney(m.price, m.currency, m.priceType)].filter(Boolean).join(' · '), date: m.date, thumb: m.photos?.[0] ? imgTag(m.photos[0], m.name) : iconCanteen(42), d: 'canteen' });
+  for (const t of S.trips) items.push({ type: 'trip', id: t.id, ts: t.createdAt || 0, title: (t.status === 'want' ? '想去：' : '') + t.title, sub: (t.places || []).map(p => p.name).slice(0, 4).join(' → '), date: t.start, thumb: tripCover(t) ? imgTag(tripCover(t), t.title) : iconTravel(42), d: 'travel' });
+  return items.sort((a, b) => b.ts - a.ts).slice(0, 8);
+}
+function tripCountries(trips) { const s = new Set(); for (const t of trips) for (const p of t.places || []) if (p.loc?.country) s.add(p.loc.country); return s; }
+const VIEW = {};
+VIEW.home = {
+  mount(v) { v.innerHTML = `<section class="hero" id="hero"></section><div class="districts" id="districts"></div><div class="soon-note" id="soon"></div><section><div class="section-title"><h2>城市动态</h2><span class="muted tiny">最近新添的记录</span></div><div class="feed" id="feed"></div></section>`; },
+  update() {
+    const days = daysTogether();
+    $('#hero').innerHTML = `<div>
+        <h1>${esc(S.meta?.headline || HERO_DEFAULT.headline)}</h1>
+        <p class="motto">${nl2br(S.meta?.motto || HERO_DEFAULT.motto)}</p>
+        ${days ? `<div class="days">噜和蛋在一起的第 <b>${days}</b> 天</div>` : `<button class="btn edit-only" type="button" data-act="settings">设置在一起的日子</button>`}
+      </div>
+      <div class="hero-art">${townSVG()}<span class="bubble">${esc(S.meta?.bubble || HERO_DEFAULT.bubble)}</span><div class="duo">${avatar('lu', 120)}${avatar('dan', 112)}</div></div>`;
+    const done = S.movies.filter(m => m.status !== 'want'), want = S.movies.filter(m => m.status === 'want');
+    const lastMovie = [...done].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    const meals = S.meals.filter(m => m.status !== 'want');
+    const lastMeal = [...meals].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0];
+    const tripsDone = S.trips.filter(t => t.status !== 'want');
+    const lastTrip = [...tripsDone].sort((a, b) => (b.start || '').localeCompare(a.start || ''))[0];
+    const placesN = tripsDone.reduce((n, t) => n + (t.places?.length || 0), 0);
+    $('#districts').innerHTML = `
+      <a class="card dcard cinema" href="#cinema"><div class="dcard-top">${iconCinema(58)}<h2>噜蛋影院</h2></div>
+        <div class="stat">看过 <b>${done.length}</b> 部 · 想看 <b>${want.length}</b> 部</div>
+        <div class="latest">${lastMovie ? `最近：《${esc(lastMovie.title)}》 ${fmtDate(lastMovie.date)}` : '还没有记录，去记第一部吧'}</div></a>
+      <a class="card dcard canteen" href="#canteen"><div class="dcard-top">${iconCanteen(58)}<h2>噜蛋食堂</h2></div>
+        <div class="stat">记了 <b>${meals.length}</b> 顿 · 在家 <b>${meals.filter(m => m.kind === 'home').length}</b> · 在外 <b>${meals.filter(m => m.kind !== 'home').length}</b></div>
+        <div class="latest">${lastMeal ? `最近一顿：${esc(lastMeal.name)} ${fmtDate(lastMeal.date)}` : '还没有记录，今晚吃什么？'}</div></a>
+      <a class="card dcard travel" href="#travel"><div class="dcard-top">${iconTravel(58)}<h2>噜蛋旅行社</h2></div>
+        <div class="stat">去过 <b>${tripCountries(tripsDone).size}</b> 个国家/地区 · <b>${placesN}</b> 个地方</div>
+        <div class="latest">${lastTrip ? `最近：${esc(lastTrip.title)}` : '还没有记录，下一站去哪？'}</div></a>
+      ${S.isAdmin === false ? '' : investCardHTML()}
+`;
+    $('#soon').innerHTML = `${iconSoon(40)}<span>新街区规划中：城市还在长大，想加什么板块随时说。</span>`;
+    const feed = feedItems();
+    $('#feed').innerHTML = loadingOr('movies', feed.length ? feed.map(f => `<button type="button" class="feed-item" data-act="open-${f.type}" data-id="${esc(f.id)}"><span class="feed-thumb">${f.thumb}</span><span class="feed-main"><span class="feed-title">${esc(f.title)}</span><br><span class="feed-sub">${esc(f.sub)}</span></span><span class="feed-date">${fmtDate(f.date)}</span></button>`).join('')
+      : `<div class="empty"><div>城里还很安静。去各个街区记下第一条吧！</div></div>`);
+  },
+};
+
+/* ---------- CINEMA ---------- */
+const POSTER_COLORS = ['#B9B5EC', '#F7B49B', '#9FD3C0', '#F6D88A', '#E9B8D2', '#B8D4EE', '#D9C7A7'];
+function posterHTML(m, full = false) {
+  if (m.poster) return imgTag(m.poster, m.title + ' 海报', { full });
+  return `<div class="poster-ph" style="background:${hashColor(m.title, POSTER_COLORS)}"><div class="pt">${esc(m.title)}</div><div class="pf">${iconCinema(44)}</div></div>`;
+}
+function miniRatings(it) {
+  return `<span class="mini-ratings">${['lu', 'dan'].map(w => it?.[w]?.stars ? `<span><span class="who-dot ${w}">${WHO[w]}</span>${starsHTML(it[w].stars, 13)}</span>` : '').join('')}</span>`;
+}
+VIEW.cinema = {
+  mount(v) {
+    const u = S.ui.cinema;
+    v.innerHTML = `<div class="district-head">${iconCinema(72)}<div><h1>噜蛋影院</h1><p>一起看过的电影，和两个人各自的评价</p></div>
+        <div class="head-actions"><button class="btn cinema edit-only" type="button" data-act="new-movie">＋ 记一部电影</button></div></div>
+      <div class="toolbar">
+        <div class="tabs" id="cin-tabs"><button type="button" data-tab="done">看过</button><button type="button" data-tab="want">想看</button></div>
+        <input class="search" id="cin-q" type="search" placeholder="搜片名、标签、评论" value="${esc(u.q)}" aria-label="搜索电影">
+        <select class="sel" id="cin-year" aria-label="年份"></select>
+        <select class="sel" id="cin-sort" aria-label="排序">
+          <option value="recent">最近看的</option><option value="avg">平均分最高</option><option value="lu">噜最爱</option><option value="dan">蛋最爱</option><option value="diff">意见分歧最大</option>
+        </select>
+      </div>
+      <div id="cin-list"></div>`;
+    $('#cin-sort').value = u.sort;
+    $('#cin-tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { u.tab = b.dataset.tab; this.update(); } });
+    $('#cin-q').addEventListener('input', e => { u.q = e.target.value; this.update(); });
+    $('#cin-year').addEventListener('change', e => { u.year = e.target.value; this.update(); });
+    $('#cin-sort').addEventListener('change', e => { u.sort = e.target.value; this.update(); });
+  },
+  update() {
+    const u = S.ui.cinema;
+    const done = S.movies.filter(m => m.status !== 'want'), want = S.movies.filter(m => m.status === 'want');
+    $$('#cin-tabs button').forEach(b => { b.setAttribute('aria-pressed', b.dataset.tab === u.tab); b.textContent = (b.dataset.tab === 'done' ? '看过 ' : '想看 ') + (b.dataset.tab === 'done' ? done.length : want.length); });
+    const years = [...new Set(done.map(m => (m.date || '').slice(0, 4)).filter(Boolean))].sort().reverse();
+    $('#cin-year').innerHTML = `<option value="">全部年份</option>` + years.map(y => `<option value="${y}" ${y === u.year ? 'selected' : ''}>${y} 年</option>`).join('');
+    $('#cin-year').hidden = u.tab === 'want'; $('#cin-sort').hidden = u.tab === 'want';
+    let list = u.tab === 'want' ? want : done;
+    const q = u.q.trim().toLowerCase();
+    if (q) list = list.filter(m => [m.title, m.originalTitle, (m.tags || []).join(' '), m.lu?.short, m.dan?.short, m.lu?.long, m.dan?.long, m.note].join(' ').toLowerCase().includes(q));
+    if (u.year && u.tab === 'done') list = list.filter(m => (m.date || '').startsWith(u.year));
+    const by = {
+      recent: (a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || 0) - (a.createdAt || 0),
+      avg: (a, b) => avgStars(b) - avgStars(a), lu: (a, b) => (b.lu?.stars || 0) - (a.lu?.stars || 0), dan: (a, b) => (b.dan?.stars || 0) - (a.dan?.stars || 0),
+      diff: (a, b) => diffOf(b) - diffOf(a),
+    };
+    list = [...list].sort(u.tab === 'want' ? by.recent : by[u.sort]);
+    if (u.sort === 'diff' && u.tab === 'done') list = list.filter(m => m.lu?.stars && m.dan?.stars);
+    const el = $('#cin-list');
+    if (!list.length) {
+      el.innerHTML = loadingOr('movies', (q || u.year) ? `<div class="empty">没有符合条件的电影。</div>` : (u.tab === 'want'
+        ? emptyState('想看清单还是空的', '看到想一起看的电影，就先放进来。', `<button class="btn cinema edit-only" type="button" data-act="new-movie" data-status="want">＋ 加一部想看的</button>`)
+        : emptyState('影院还没开张', '记下你们一起看的第一部电影，两个人各打各的分。', `<button class="btn cinema edit-only" type="button" data-act="new-movie">＋ 记一部电影</button>`)));
+      return;
+    }
+    el.innerHTML = `<div class="poster-grid">${list.map(m => `<button type="button" class="poster-card" data-act="open-movie" data-id="${esc(m.id)}">
+        <div class="poster">${posterHTML(m)}${u.sort === 'diff' && u.tab === 'done' ? `<span class="diff-badge">差 ${diffOf(m)} 星</span>` : ''}</div>
+        <div class="poster-meta"><div class="t">${esc(m.title)}</div>
+          <div class="d">${u.tab === 'want' ? (m.note ? esc(m.note) : '想看') : [fmtDate(m.date), m.where === 'cinema' ? '电影院' : m.where === 'home' ? '在家' : ''].filter(Boolean).join(' · ')}</div>
+          ${u.tab === 'done' ? miniRatings(m) : ''}</div></button>`).join('')}</div>`;
+  },
+};
+const diffOf = m => (m.lu?.stars && m.dan?.stars) ? Math.abs(m.lu.stars - m.dan.stars) : -1;
+
+function openMovie(id) {
+  const m = S.movies.find(x => x.id === id); if (!m) return;
+  const want = m.status === 'want';
+  const sayCol = w => `<div class="say-col ${w}"><div class="say-head">${avatar(w, 44)}<span class="nm">${WHO[w]}</span>${m[w]?.stars ? starsHTML(m[w].stars, 18) + `<span class="num">${m[w].stars.toFixed(1)}</span>` : '<span class="muted tiny">还没打分</span>'}</div>
+      ${m[w]?.short ? `<div class="say-bubble">${esc(m[w].short)}</div>` : ''}
+      ${m[w]?.long ? `<div class="say-long prose">${nl2br(m[w].long)}</div>` : ''}</div>`;
+  const md = openModal({
+    title: want ? '想看' : '看过', wide: true,
+    body: `<div class="detail-top"><div class="detail-poster" ${m.poster ? 'style="cursor:zoom-in" data-lb="1"' : ''}>${posterHTML(m, true)}</div>
+      <div class="detail-info"><h3>${esc(m.title)}</h3>${m.originalTitle ? `<div class="muted">${esc(m.originalTitle)}</div>` : ''}
+        <div class="chips">${want ? '<span class="chip want">想看</span>' : ''}${m.date && !want ? `<span class="chip cinema num">${fmtDate(m.date)}</span>` : ''}${m.where ? `<span class="chip">${m.where === 'cinema' ? '电影院' : m.where === 'home' ? '在家看' : '其他地方'}${m.whereNote ? ' · ' + esc(m.whereNote) : ''}</span>` : ''}${(m.tags || []).map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
+        ${m.note ? `<div class="prose">${nl2br(m.note)}</div>` : ''}
+        ${!want ? `<div class="say">${sayCol('lu')}${sayCol('dan')}</div>` : ''}
+      </div></div>`,
+    foot: `<button class="btn danger small left edit-only" type="button" data-x="del">删除</button><button class="btn edit-only" type="button" data-x="edit">编辑</button>${want ? '<button class="btn cinema edit-only" type="button" data-x="watched">看完了！</button>' : ''}`,
+  });
+  $('[data-lb]', md.el)?.addEventListener('click', () => openLightbox([m.poster]));
+  md.el.addEventListener('click', async e => {
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'edit') { await md.close(true); movieForm(m); }
+    if (x === 'watched') { await md.close(true); movieForm({ ...m, status: 'done', date: todayStr() }, { convert: true }); }
+    if (x === 'del') {
+      if (!(await confirmDialog(`删除《${m.title}》？照片也会一起删掉，删了就找不回来了。`, { ok: '删除', danger: true }))) return;
+      try { await deleteDoc('movies', m, m.poster ? [m.poster] : []); md.close(true); toast('删掉了'); } catch (err) { handleWriteError(err); }
+    }
+  });
+}
+const MOVIE_TAGS = ['剧情', '喜剧', '爱情', '动画', '科幻', '悬疑', '惊悚', '恐怖', '动作', '奇幻', '纪录片', '音乐', '家庭', '战争'];
+function movieForm(m = null, { status, convert = false } = {}) {
+  const isNew = !m?.id;
+  const d = m || { status: status || 'done', date: todayStr(), where: 'cinema' };
+  const md = openModal({
+    title: isNew ? (d.status === 'want' ? '加一部想看的' : '记一部电影') : (convert ? '看完啦，记一下' : '编辑电影'), wide: true,
+    body: `<form class="form" id="mv-form" novalidate>
+      <div class="field"><span class="flabel">状态</span>${seg('mv-status', [['done', '看过'], ['want', '想看']], d.status || 'done')}</div>
+      <div class="row2">
+        <div class="field"><label for="mv-title">片名 <b class="req">*</b></label><input id="mv-title" type="text" value="${esc(d.title || '')}" placeholder="比如：千与千寻"></div>
+        <div class="field"><label for="mv-orig">原名</label><input id="mv-orig" type="text" value="${esc(d.originalTitle || '')}" placeholder="原语言片名，可以不填"></div>
+      </div>
+      <div class="row2 done-only">
+        <div class="field"><label for="mv-date">哪天看的</label><input id="mv-date" type="date" value="${esc(d.date || '')}"></div>
+        <div class="field"><span class="flabel">在哪看的</span>${seg('mv-where', [['cinema', '电影院'], ['home', '在家'], ['other', '其他']], d.where || 'cinema')}</div>
+      </div>
+      <div class="field done-only"><label for="mv-wn">地点备注</label><input id="mv-wn" type="text" value="${esc(d.whereNote || '')}" placeholder="比如：GV Funan、家里的投影"></div>
+      <div class="field"><label for="mv-tags">类型标签</label><input id="mv-tags" type="text" value="${esc((d.tags || []).join('、'))}" placeholder="用顿号或逗号隔开">${suggestHTML('mv-tags', MOVIE_TAGS, (d.tags || []).join(','))}</div>
+      <div class="field"><span class="flabel">海报</span><div id="mv-poster"></div><div class="hint">拍一张海报或者截个图都行。</div></div>
+      <div class="field want-only"><label for="mv-note">为什么想看</label><textarea id="mv-note" rows="2" placeholder="谁推荐的？在哪能看？">${esc(d.note || '')}</textarea></div>
+      <div class="done-only">${dualFields('mv', d, { long: true })}</div>
+    </form>`,
+    foot: `<button class="btn" type="button" data-x="cancel">取消</button><button class="btn cinema" type="button" data-x="save">保存</button>`,
+  });
+  const root = md.el;
+  const pf = mountPhotoField($('#mv-poster', root), d.poster ? [d.poster] : [], { max: 1, label: '上传海报' });
+  const sync = () => { const w = getSeg(root, 'mv-status') === 'want'; $$('.done-only', root).forEach(x => x.hidden = w); $$('.want-only', root).forEach(x => x.hidden = !w); };
+  root.addEventListener('change', e => { if (e.target.name === 'mv-status') sync(); }); sync();
+  const initial = serializeForm(root); md.guard = formGuard(root, initial);
+  md.onClose = () => { if (!md.saved) pf.cleanup(false); };
+  root.addEventListener('click', async e => {
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'cancel') return md.close();
+    if (x !== 'save') return;
+    const title = val(root, '#mv-title'); if (!title) return fieldError(root, '#mv-title', '片名还没填');
+    if (pf.busy()) return toast('照片还在上传，稍等一下');
+    const st = getSeg(root, 'mv-status');
+    const doc = { title, originalTitle: val(root, '#mv-orig'), status: st, tags: splitTags(val(root, '#mv-tags')), poster: pf.get()[0] || null, note: val(root, '#mv-note') };
+    if (st === 'done') Object.assign(doc, { date: val(root, '#mv-date'), where: getSeg(root, 'mv-where'), whereNote: val(root, '#mv-wn'), ...readDual(root, 'mv', true) });
+    const btn = e.target.closest('button'); btn.disabled = true;
+    try { const id = await saveDoc('movies', m?.id, doc, m); md.saved = true; await pf.cleanup(true, m?.poster ? [m.poster] : []); md.close(true); toast('记好啦'); if (!isNew) reopen(() => openMovie(id)); S.ui.cinema.tab = st; if (route() === 'cinema') VIEW.cinema.update(); }
+    catch (err) { btn.disabled = false; handleWriteError(err); }
+  });
+}
+
+/* ---------- CANTEEN ---------- */
+const CUISINES = ['家常菜', '川菜', '粤菜', '湘菜', '东北菜', '火锅', 'Hawker', '日料', '韩餐', '东南亚', '娘惹', '印度菜', '西餐', '意大利菜', '甜品', '咖啡', '小吃', '烧烤'];
+const MEAL_COLORS = { home: '#F2B632', out: '#E2785A', want: '#E9E1D3' };
+VIEW.canteen = {
+  mount(v) {
+    const u = S.ui.canteen;
+    v.innerHTML = `<div class="district-head">${iconCanteen(72)}<div><h1>噜蛋食堂</h1><p>家里做的菜、外面吃的饭，连照片和价格一起记下</p></div>
+        <div class="head-actions"><button class="btn" type="button" data-act="roulette">今天吃什么？</button><button class="btn canteen edit-only" type="button" data-act="new-meal">＋ 记一顿饭</button></div></div>
+      <div id="can-top"></div>
+      <div class="toolbar">
+        <div class="tabs" id="can-tabs"><button type="button" data-tab="all">全部</button><button type="button" data-tab="home">自己做</button><button type="button" data-tab="out">出去吃</button><button type="button" data-tab="want">想吃</button></div>
+        <input class="search" id="can-q" type="search" placeholder="搜菜名、店名、菜系、地区" value="${esc(u.q)}" aria-label="搜索">
+        <select class="sel" id="can-sort" aria-label="排序"><option value="recent">最近</option><option value="rating">评分最高</option><option value="again">还想再吃优先</option><option value="price-">价格从高到低</option><option value="price+">价格从低到高</option></select>
+      </div>
+      <div class="travel-stats" id="can-stats"></div>
+      <div class="map-block"><div id="can-map"></div><div class="hint" style="margin-top:8px">每家店按位置钉在地图上，有照片的会显示成照片小圆图。点一下看这顿吃了什么，也可以一键跳到 Google 地图导航。下面的筛选和搜索会同时作用在地图上。</div></div>
+      <div id="can-list"></div>`;
+    $('#can-sort').value = u.sort;
+    $('#can-tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { u.tab = b.dataset.tab; this.update(); } });
+    $('#can-top').append($('#can-stats'), $('.map-block', v));
+    this.map = makeMap($('#can-map'), { height: Math.min(520, Math.max(360, innerHeight * 0.55)), initial: 'pins', fallback: 'sg', views: [['pins', '所有的店'], ['sg', '新加坡'], ['asia', '亚洲'], ['world', '世界']], labelK: 1400, photoK: 250,
+      legend: `<span><i style="background:${MEAL_COLORS.home}"></i>自己做</span><span><i style="background:${MEAL_COLORS.out}"></i>出去吃</span><span><i style="background:${MEAL_COLORS.want}"></i>想吃</span>` });
+    $('#can-q').addEventListener('input', e => { u.q = e.target.value; this.update(); });
+    $('#can-sort').addEventListener('change', e => { u.sort = e.target.value; this.update(); });
+  },
+  filtered() {
+    const u = S.ui.canteen;
+    let list = S.meals.filter(m => u.tab === 'want' ? m.status === 'want' : m.status !== 'want' && (u.tab === 'all' || (u.tab === 'home' ? m.kind === 'home' : m.kind !== 'home')));
+    const q = u.q.trim().toLowerCase();
+    if (q) list = list.filter(m => [m.name, m.dishes, m.cuisine, m.loc?.area, m.lu?.short, m.dan?.short, m.note].join(' ').toLowerCase().includes(q));
+    const by = {
+      recent: (a, b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || 0) - (a.createdAt || 0),
+      rating: (a, b) => avgStars(b) - avgStars(a), again: (a, b) => (b.again ? 1 : 0) - (a.again ? 1 : 0) || avgStars(b) - avgStars(a),
+      'price-': (a, b) => (+b.price || 0) - (+a.price || 0), 'price+': (a, b) => (+a.price || Infinity) - (+b.price || Infinity),
+    };
+    return [...list].sort(by[u.sort] || by.recent);
+  },
+  update() {
+    const u = S.ui.canteen;
+    const counts = { all: S.meals.filter(m => m.status !== 'want').length, home: S.meals.filter(m => m.status !== 'want' && m.kind === 'home').length, out: S.meals.filter(m => m.status !== 'want' && m.kind !== 'home').length, want: S.meals.filter(m => m.status === 'want').length };
+    const names = { all: '全部', home: '自己做', out: '出去吃', want: '想吃' };
+    $$('#can-tabs button').forEach(b => { b.setAttribute('aria-pressed', b.dataset.tab === u.tab); b.textContent = `${names[b.dataset.tab]} ${counts[b.dataset.tab]}`; });
+    const list = this.filtered();
+    const el = $('#can-list');
+    const done = S.meals.filter(m => m.status !== 'want');
+    $('#can-stats').innerHTML = `<div class="tstat"><b>${done.length}</b>顿饭</div><div class="tstat"><b>${new Set(done.filter(m => m.kind !== 'home').map(m => m.name)).size}</b>家店</div><div class="tstat"><b>${done.filter(m => m.kind === 'home').length}</b>次自己做</div><div class="tstat"><b>${S.meals.reduce((n, m) => n + (m.photos?.length || 0), 0)}</b>张照片</div><div class="tstat"><b>${S.meals.filter(m => m.status === 'want').length}</b>个想吃</div>`;
+    {
+      const pins = list.filter(m => m.loc?.lat != null).map(m => ({
+        key: m.id, lat: m.loc.lat, lng: m.loc.lng, label: m.name, kind: m.status === 'want' ? 'want' : m.kind, color: m.status === 'want' ? MEAL_COLORS.want : MEAL_COLORS[m.kind === 'home' ? 'home' : 'out'], photo: m.photos?.[0] || '',
+        popup: `${m.photos?.length ? `<div class="pop-strip">${m.photos.slice(0, 4).map((r, i) => `<button type="button" data-act="lb" data-k="${lbKey(m.photos)}" data-i="${i}">${imgTag(r)}</button>`).join('')}</div>` : ''}<h4>${esc(m.name)}</h4><div class="muted tiny">${esc([m.loc.area, fmtDate(m.date), fmtMoney(m.price, m.currency, m.priceType)].filter(Boolean).join(' · '))}</div>${avgStars(m) ? `<div>${starsHTML(avgStars(m), 14)}</div>` : ''}<div class="acts"><button class="btn small" type="button" data-act="open-meal" data-id="${esc(m.id)}">看详情</button>${gmapsButtons(m.loc)}</div>`,
+      }));
+      this.map.setPins(pins);
+    }
+    if (!list.length) {
+      el.innerHTML = loadingOr('meals', u.q ? `<div class="empty">没有符合条件的记录。</div>` : u.tab === 'want'
+        ? emptyState('想吃清单还是空的', '刷到想去的店、想学的菜，都可以先放进来。', `<button class="btn canteen edit-only" type="button" data-act="new-meal" data-status="want">＋ 加一个想吃的</button>`)
+        : emptyState('食堂还没开火', '记下你们的第一顿：拍张照，写个价钱，两个人各打一个分。', `<button class="btn canteen edit-only" type="button" data-act="new-meal">＋ 记一顿饭</button>`));
+      return;
+    }
+    el.innerHTML = `<div class="meal-grid">${list.map(m => `<button type="button" class="card meal-card" data-act="open-meal" data-id="${esc(m.id)}">
+        <div class="meal-photo">${m.photos?.[0] ? imgTag(m.photos[0], m.name) : iconCanteen(70)}${m.photos?.length > 1 ? `<span class="count">${m.photos.length} 张</span>` : ''}</div>
+        <div class="meal-body"><div class="t">${esc(m.name)}</div>
+          <div class="row">${m.status === 'want' ? '<span class="chip want">想吃</span>' : `<span class="chip ${m.kind === 'home' ? '' : 'canteen'}">${m.kind === 'home' ? '自己做' + (m.chef ? ' · ' + (m.chef === 'both' ? '一起' : WHO[m.chef] + '掌勺') : '') : '出去吃'}</span>`}${m.cuisine ? `<span class="chip">${esc(splitTags(m.cuisine)[0])}</span>` : ''}${m.again ? '<span class="chip again">还想再吃</span>' : ''}</div>
+          <div class="row muted tiny">${esc([fmtDate(m.date), m.loc?.area].filter(Boolean).join(' · '))}</div>
+          <div class="row" style="justify-content:space-between">${miniRatings(m)}<span class="price">${esc(fmtMoney(m.price, m.currency, m.priceType))}</span></div>
+        </div></button>`).join('')}</div>`;
+  },
+};
+function galleryHTML(ids, alt) {
+  if (!ids?.length) return '';
+  return `<div class="gallery"><div class="gallery-main" data-gi="0">${imgTag(ids[0], alt, { full: true })}</div>${ids.length > 1 ? `<div class="gallery-thumbs">${ids.map((id, i) => `<button type="button" data-gt="${i}" aria-current="${i === 0}" aria-label="第 ${i + 1} 张">${imgTag(id)}</button>`).join('')}</div>` : ''}</div>`;
+}
+function wireGallery(root, ids) {
+  let cur = 0;
+  root.addEventListener('click', e => {
+    const t = e.target.closest('[data-gt]');
+    if (t) { cur = +t.dataset.gt; $('.gallery-main', root).innerHTML = imgTag(ids[cur], '', { full: true }); $$('[data-gt]', root).forEach(b => b.setAttribute('aria-current', +b.dataset.gt === cur)); return; }
+    if (e.target.closest('.gallery-main')) openLightbox(ids, cur);
+    const pg = e.target.closest('[data-pg]'); if (pg) openLightbox(ids, +pg.dataset.pg);
+  });
+}
+function openMeal(id) {
+  const m = S.meals.find(x => x.id === id); if (!m) return;
+  const want = m.status === 'want';
+  const sayCol = w => `<div class="say-col ${w}"><div class="say-head">${avatar(w, 40)}<span class="nm">${WHO[w]}</span>${m[w]?.stars ? starsHTML(m[w].stars, 17) + `<span class="num">${m[w].stars.toFixed(1)}</span>` : '<span class="muted tiny">还没打分</span>'}</div>${m[w]?.short ? `<div class="say-bubble">${esc(m[w].short)}</div>` : ''}</div>`;
+  const md = openModal({
+    title: want ? '想吃' : (m.kind === 'home' ? '自己做的' : '出去吃的'), wide: true,
+    body: `<div class="detail-top ${m.photos?.length ? '' : 'noside'}" style="${m.photos?.length ? 'grid-template-columns:minmax(0,1.1fr) 1fr' : ''}">${galleryHTML(m.photos, m.name)}
+      <div class="detail-info"><h3>${esc(m.name)}</h3>
+        <div class="chips">${want ? '<span class="chip want">想吃</span>' : `<span class="chip canteen">${m.kind === 'home' ? '自己做' : '出去吃'}</span>`}${m.chef && m.kind === 'home' ? `<span class="chip">${m.chef === 'both' ? '一起掌勺' : WHO[m.chef] + '掌勺'}</span>` : ''}${splitTags(m.cuisine).map(c => `<span class="chip">${esc(c)}</span>`).join('')}${m.date && !want ? `<span class="chip num">${fmtDate(m.date)}</span>` : ''}${m.again ? '<span class="chip again">还想再吃</span>' : ''}</div>
+        ${m.price ? `<div class="price" style="font-size:26px">${esc(fmtMoney(m.price, m.currency, m.priceType))}<span class="muted tiny" style="font-family:var(--font-body)"> ${m.priceType === 'pp' ? '人均' : '总共'}</span></div>` : ''}
+        ${m.dishes ? `<div><b>${m.kind === 'home' ? '做了什么' : '点了什么'}：</b>${nl2br(m.dishes)}</div>` : ''}
+        ${m.loc && (m.loc.lat != null || m.loc.gmaps) ? `<div class="loc-line"><span>${esc(m.loc.area || '')}</span>${gmapsButtons(m.loc)}</div>` : ''}
+        ${m.note ? `<div class="prose">${nl2br(m.note)}</div>` : ''}
+      </div></div>
+      ${m.recipe ? `<div class="subhead">做法</div><div class="prose">${nl2br(m.recipe)}</div>` : ''}
+      ${!want && (m.lu?.stars || m.dan?.stars || m.lu?.short || m.dan?.short) ? `<div class="say">${sayCol('lu')}${sayCol('dan')}</div>` : ''}`,
+    foot: `<button class="btn danger small left edit-only" type="button" data-x="del">删除</button><button class="btn edit-only" type="button" data-x="edit">编辑</button>${want ? '<button class="btn canteen edit-only" type="button" data-x="ate">吃过了！</button>' : ''}`,
+  });
+  wireGallery(md.el, m.photos || []);
+  md.el.addEventListener('click', async e => {
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'edit') { await md.close(true); mealForm(m); }
+    if (x === 'ate') { await md.close(true); mealForm({ ...m, status: 'done', date: todayStr() }, { convert: true }); }
+    if (x === 'del') {
+      if (!(await confirmDialog(`删除「${m.name}」？照片也会一起删掉，删了就找不回来了。`, { ok: '删除', danger: true }))) return;
+      try { await deleteDoc('meals', m, m.photos || []); md.close(true); toast('删掉了'); } catch (err) { handleWriteError(err); }
+    }
+  });
+}
+function mealForm(m = null, { status, convert = false } = {}) {
+  const isNew = !m?.id;
+  const d = m || { status: status || 'done', kind: 'out', date: todayStr(), currency: 'SGD', priceType: 'total' };
+  const md = openModal({
+    title: isNew ? (d.status === 'want' ? '加一个想吃的' : '记一顿饭') : (convert ? '吃过啦，记一下' : '编辑'), wide: true,
+    body: `<form class="form" novalidate>
+      <div class="row2"><div class="field"><span class="flabel">状态</span>${seg('ml-status', [['done', '吃过'], ['want', '想吃']], d.status || 'done')}</div>
+        <div class="field"><span class="flabel">类型</span>${seg('ml-kind', [['out', '出去吃'], ['home', '自己做']], d.kind || 'out')}</div></div>
+      <div class="field"><label for="ml-name"><span class="lbl-name">店名</span> <b class="req">*</b></label><input id="ml-name" type="text" value="${esc(d.name || '')}"></div>
+      <div class="field"><label for="ml-dishes" class="lbl-dishes">点了什么 / 推荐菜</label><textarea id="ml-dishes" rows="2">${esc(d.dishes || '')}</textarea></div>
+      <div class="field"><label for="ml-cuisine">菜系</label><input id="ml-cuisine" type="text" value="${esc(d.cuisine || '')}" placeholder="可以自己写，比如 Hawker、潮汕菜">${suggestHTML('ml-cuisine', CUISINES, d.cuisine)}</div>
+      <div class="row3 done-only">
+        <div class="field"><label for="ml-price">价格</label><input id="ml-price" type="number" min="0" step="0.01" inputmode="decimal" value="${esc(d.price ?? '')}" placeholder="0.00"></div>
+        <div class="field"><label for="ml-cur">币种</label><select id="ml-cur">${Object.keys(CUR).map(c => `<option value="${c}" ${c === (d.currency || 'SGD') ? 'selected' : ''}>${c} ${CUR[c]}</option>`).join('')}</select></div>
+        <div class="field"><span class="flabel">算法</span>${seg('ml-pt', [['total', '总共'], ['pp', '人均']], d.priceType || 'total')}</div>
+      </div>
+      <div class="row2 done-only"><div class="field"><label for="ml-date">哪天吃的</label><input id="ml-date" type="date" value="${esc(d.date || '')}"></div>
+        <div class="field home-only"><span class="flabel">谁掌勺</span>${seg('ml-chef', [['lu', '噜'], ['dan', '蛋'], ['both', '一起']], d.chef || 'both')}</div></div>
+      <div class="field home-only"><label for="ml-recipe">做法 / 小诀窍</label><textarea id="ml-recipe" rows="4" placeholder="下次照着做也不会忘">${esc(d.recipe || '')}</textarea></div>
+      <fieldset class="box out-only"><legend>在哪里</legend><div id="ml-loc"></div></fieldset>
+      <div class="field"><span class="flabel">照片</span><div id="ml-photos"></div><div class="hint">第一张是封面，点照片左上角的星星可以换封面。</div></div>
+      <div class="field"><label for="ml-note">备注</label><textarea id="ml-note" rows="2" placeholder="排了多久队、下次想点什么……">${esc(d.note || '')}</textarea></div>
+      <div class="done-only">${dualFields('ml', d)}</div>
+      <label class="check done-only"><input type="checkbox" id="ml-again" ${d.again ? 'checked' : ''}> 还想再吃</label>
+    </form>`,
+    foot: `<button class="btn" type="button" data-x="cancel">取消</button><button class="btn canteen" type="button" data-x="save">保存</button>`,
+  });
+  const root = md.el;
+  const pf = mountPhotoField($('#ml-photos', root), d.photos || []);
+  const lp = mountLocationPicker($('#ml-loc', root), d.loc, { view: 'sg', onName: ({ name }) => { const n = $('#ml-name', root); if (!n.value.trim()) n.value = name; },
+    getName: () => val(root, '#ml-name'), hint: () => `这是一家餐厅、咖啡店或小贩中心的摊位。${val(root, '#ml-dishes') ? '吃的是：' + val(root, '#ml-dishes') + '。' : ''}除非名字里写了别的城市，否则它大概率在新加坡。` });
+  const sync = () => {
+    const w = getSeg(root, 'ml-status') === 'want', home = getSeg(root, 'ml-kind') === 'home';
+    $$('.done-only', root).forEach(x => x.hidden = w);
+    $$('.home-only', root).forEach(x => x.hidden = !home || (w && x.closest('.done-only')));
+    $$('.out-only', root).forEach(x => x.hidden = home);
+    $('.lbl-name', root).textContent = home ? '菜名' : '店名';
+    $('#ml-name', root).placeholder = home ? '比如：番茄炒蛋' : '比如：Maxwell Food Centre 天天海南鸡饭';
+    $('.lbl-dishes', root).textContent = home ? '做了哪些菜' : (w ? '想点什么' : '点了什么 / 推荐菜');
+  };
+  root.addEventListener('change', e => { if (['ml-status', 'ml-kind'].includes(e.target.name)) sync(); }); sync();
+  setTimeout(() => { md.guard = formGuard(root, serializeForm(root)); }, 0);
+  md.onClose = () => { if (!md.saved) pf.cleanup(false); };
+  root.addEventListener('click', async e => {
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'cancel') return md.close();
+    if (x !== 'save') return;
+    const name = val(root, '#ml-name'); if (!name) return fieldError(root, '#ml-name', '名字还没填');
+    if (pf.busy()) return toast('照片还在上传，稍等一下');
+    const st = getSeg(root, 'ml-status'), kind = getSeg(root, 'ml-kind');
+    const doc = { name, status: st, kind, dishes: val(root, '#ml-dishes'), cuisine: splitTags(val(root, '#ml-cuisine')).join('、'), photos: pf.get(), note: val(root, '#ml-note'), loc: kind === 'home' ? null : lp.get() };
+    if (st === 'done') {
+      const p = val(root, '#ml-price');
+      Object.assign(doc, { date: val(root, '#ml-date'), price: p === '' ? null : +p, currency: $('#ml-cur', root).value, priceType: getSeg(root, 'ml-pt'), again: $('#ml-again', root).checked, ...readDual(root, 'ml') });
+      if (kind === 'home') { doc.chef = getSeg(root, 'ml-chef'); doc.recipe = val(root, '#ml-recipe'); }
+    }
+    const btn = e.target.closest('button'); btn.disabled = true;
+    try { const id = await saveDoc('meals', m?.id, doc, m); md.saved = true; await pf.cleanup(true, m?.photos || []); md.close(true); toast('记好啦'); if (!isNew) reopen(() => openMeal(id)); S.ui.canteen.tab = st === 'want' ? 'want' : 'all'; if (route() === 'canteen') VIEW.canteen.update(); }
+    catch (err) { btn.disabled = false; handleWriteError(err); }
+  });
+}
+function openRoulette() {
+  const done = S.meals.filter(m => m.status !== 'want');
+  let pool = done.filter(m => m.again || avgStars(m) >= 4);
+  if (pool.length < 3) pool = [...pool, ...done.filter(m => !pool.includes(m))];
+  pool = [...pool, ...S.meals.filter(m => m.status === 'want')];
+  const md = openModal({
+    title: '今天吃什么？',
+    body: pool.length ? `<div class="roulette"><div class="pair" style="display:flex;gap:6px">${avatar('lu', 76)}${avatar('dan', 72)}</div><div class="slot" aria-live="polite">点下面的按钮</div><div class="muted tiny">从「还想再吃」、高分记录和想吃清单里抽</div><div id="rl-res"></div><button class="btn primary" type="button" data-x="spin">抽一个！</button></div>`
+      : `<div class="roulette">${emptyState('还没有可以抽的', '先记几顿饭，或者往想吃清单里放点东西。')}</div>`,
+  });
+  md.el.addEventListener('click', async e => {
+    if (e.target.closest('[data-x="spin"]')) {
+      const btn = e.target.closest('button'); btn.disabled = true;
+      const slot = $('.slot', md.el); const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let pick;
+      for (let i = 0, n = reduce ? 1 : 18; i < n; i++) { pick = pool[Math.floor(Math.random() * pool.length)]; slot.textContent = pick.name; await sleep(40 + i * 8); }
+      $('#rl-res', md.el).innerHTML = `<div class="chips" style="justify-content:center">${pick.status === 'want' ? '<span class="chip want">想吃</span>' : `<span class="chip">${pick.kind === 'home' ? '自己做' : '出去吃'}</span>`}${pick.loc?.area ? `<span class="chip">${esc(pick.loc.area)}</span>` : ''}</div><div style="margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="btn small" type="button" data-act="open-meal" data-id="${esc(pick.id)}">看看这条</button>${gmapsButtons(pick.loc)}</div>`;
+      btn.disabled = false; btn.textContent = '再抽一次';
+    }
+  });
+}
+
+/* ---------- TRAVEL ---------- */
+const tripRefs = t => [...(t?.photos || []), ...(t?.places || []).flatMap(p => p.photos || [])];
+const tripCover = t => t.photos?.[0] || (t.places || []).find(p => p.photos?.length)?.photos[0] || '';
+function placePopup(t, p, i) {
+  const ph = p.photos || [];
+  return `${ph.length ? `<div class="pop-strip">${ph.slice(0, 4).map((r, j) => `<button type="button" data-act="lb" data-k="${lbKey(ph)}" data-i="${j}" aria-label="看第 ${j + 1} 张">${imgTag(r)}</button>`).join('')}${ph.length > 4 ? `<span class="more">+${ph.length - 4}</span>` : ''}</div>` : ''}
+    <h4>${esc(p.name)}${p.local ? ` <span class="muted tiny">${esc(p.local)}</span>` : ''}</h4><div class="muted tiny">${esc(p.loc?.area || '')}</div>
+    ${t ? `<div class="tiny">${t.status === 'want' ? '想去 · ' : `第 ${i + 1} 站 · `}${esc(t.title)}</div>` : ''}${p.note ? `<div class="tiny">${esc(p.note)}</div>` : ''}
+    <div class="acts">${t ? `<button class="btn small" type="button" data-act="open-trip" data-id="${esc(t.id)}">看这次旅行</button>` : ''}${gmapsButtons(p.loc)}</div>`;
+}
+function tripPinsRoutes(trips, { numbered = false } = {}) {
+  const pins = [], routes = [];
+  for (const t of trips) {
+    const w = t.status === 'want', pts = [];
+    (t.places || []).forEach((p, i) => {
+      if (p.loc?.lat == null) return;
+      pts.push([p.loc.lng, p.loc.lat]);
+      pins.push({ key: t.id + ':' + i, lat: p.loc.lat, lng: p.loc.lng, label: numbered ? `${i + 1}. ${p.name}` : p.name, kind: w ? 'want' : 'done', color: w ? '#E9E1D3' : 'var(--travel)', photo: p.photos?.[0] || '', num: numbered ? i + 1 : 0, popup: placePopup(numbered ? null : t, p, i) });
+    });
+    routes.push({ key: t.id, kind: w ? 'want' : 'done', pts });
+  }
+  return { pins, routes };
+}
+VIEW.travel = {
+  mount(v) {
+    v.innerHTML = `<div class="district-head">${iconTravel(72)}<div><h1>噜蛋旅行社</h1><p>去过的地方钉在地图上，每个景点的照片都挂在它自己的位置</p></div>
+        <div class="head-actions"><button class="btn travel edit-only" type="button" data-act="new-trip">＋ 记一次旅行</button><button class="btn edit-only" type="button" data-act="new-trip" data-status="want">＋ 想去的地方</button></div></div>
+      <div class="travel-stats" id="tr-stats"></div>
+      <div class="map-block"><div id="tr-map"></div><div class="hint" style="margin-top:8px">放大到城市以后，有照片的景点会变成照片小圆图，虚线是每次旅行的游览顺序。点一下看这个景点的照片。</div></div>
+      <div class="toolbar"><div class="tabs" id="tr-tabs"><button type="button" data-tab="done">去过的</button><button type="button" data-tab="want">想去的</button></div></div>
+      <div id="tr-list"></div>`;
+    this.map = makeMap($('#tr-map'), { height: Math.min(560, Math.max(380, innerHeight * 0.6)), initial: 'pins', fallback: 'asia', provinces: true, labelK: 40, photoK: 18, views: [['pins', '所有足迹'], ['sg', '新加坡'], ['eastasia', '东亚'], ['asia', '亚洲'], ['world', '世界']],
+      legend: `<span><i style="background:var(--visited)"></i>去过的国家/省</span><span><i style="background:var(--travel)"></i>去过的地方</span><span><i style="background:#E9E1D3"></i>想去</span>` });
+    $('#tr-tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { S.ui.travel.tab = b.dataset.tab; this.update(); } });
+  },
+  update() {
+    const u = S.ui.travel;
+    const done = S.trips.filter(t => t.status !== 'want'), want = S.trips.filter(t => t.status === 'want');
+    const places = done.flatMap(t => (t.places || []).filter(p => p.loc?.lat != null));
+    const photosN = done.reduce((n, t) => n + tripRefs(t).length, 0);
+    $('#tr-stats').innerHTML = `<div class="tstat"><b>${done.length}</b>次旅行</div><div class="tstat"><b>${tripCountries(done).size}</b>个国家/地区</div><div class="tstat"><b>${done.reduce((n, t) => n + (t.places?.length || 0), 0)}</b>个地方</div><div class="tstat"><b>${photosN}</b>张照片</div><div class="tstat"><b>${want.length}</b>个想去</div>`;
+    const { pins, routes } = tripPinsRoutes(S.trips);
+    this.map.setRoutes(routes); this.map.setPins(pins);
+    this.map.setVisited(places.map(p => [p.loc.lng, p.loc.lat]));
+    $$('#tr-tabs button').forEach(b => { b.setAttribute('aria-pressed', b.dataset.tab === u.tab); b.textContent = (b.dataset.tab === 'done' ? '去过的 ' : '想去的 ') + (b.dataset.tab === 'done' ? done.length : want.length); });
+    const list = (u.tab === 'want' ? want : done).slice().sort((a, b) => (b.start || '').localeCompare(a.start || '') || (b.createdAt || 0) - (a.createdAt || 0));
+    const el = $('#tr-list');
+    if (!list.length) {
+      el.innerHTML = loadingOr('trips', u.tab === 'want'
+        ? emptyState('还没有想去的地方', '把下一站先钉上去吧。', `<button class="btn travel edit-only" type="button" data-act="new-trip" data-status="want">＋ 想去的地方</button>`)
+        : emptyState('旅行社还没接过单', '记下你们的第一次旅行：一路去了哪些景点，每个景点拍了什么照片。', `<button class="btn travel edit-only" type="button" data-act="new-trip">＋ 记一次旅行</button>`));
+      return;
+    }
+    el.innerHTML = `<div class="trip-grid">${list.map(t => { const cov = tripCover(t), n = tripRefs(t).length; return `<button type="button" class="card trip-card" data-act="open-trip" data-id="${esc(t.id)}">
+        <div class="trip-cover">${cov ? imgTag(cov, t.title) : iconTravel(80)}${n > 1 ? `<span class="count">${n} 张</span>` : ''}</div>
+        <div class="trip-body"><h3>${esc(t.title)}</h3>
+          <div class="muted tiny num">${esc(tripDates(t))}</div>
+          ${t.summary ? `<div class="tiny">${esc(t.summary)}</div>` : ''}
+          <div class="trip-places">${(t.places || []).slice(0, 6).map(p => `<span class="chip ${t.status === 'want' ? 'want' : 'travel'}">${esc(p.name)}</span>`).join('')}${(t.places?.length || 0) > 6 ? `<span class="chip">+${t.places.length - 6}</span>` : ''}</div>
+        </div></button>`; }).join('')}</div>`;
+  },
+};
+function tripDates(t) {
+  if (!t.start) return t.status === 'want' ? (t.when || '还没定时间') : '';
+  if (!t.end || t.end === t.start) return fmtDate(t.start);
+  const days = Math.round((new Date(t.end) - new Date(t.start)) / 86400000) + 1;
+  return `${fmtDate(t.start)} – ${fmtDate(t.end)} · ${days} 天`;
+}
+function openTrip(id) {
+  const t = S.trips.find(x => x.id === id); if (!t) return;
+  const want = t.status === 'want';
+  const places = t.places || [];
+  const strip = (refs) => refs?.length ? `<div class="place-photos">${refs.slice(0, 8).map((r, j) => `<button type="button" data-act="lb" data-k="${lbKey(refs)}" data-i="${j}" aria-label="看第 ${j + 1} 张">${imgTag(r)}</button>`).join('')}${refs.length > 8 ? `<button type="button" class="more" data-act="lb" data-k="${lbKey(refs)}" data-i="8">+${refs.length - 8}</button>` : ''}</div>` : '';
+  const md = openModal({
+    title: want ? '想去' : '旅行', wide: true,
+    body: `<h3 style="font-size:30px">${esc(t.title)}</h3>
+      <div class="chips" style="margin:8px 0 12px">${want ? '<span class="chip want">想去</span>' : ''}<span class="chip travel num">${esc(tripDates(t))}</span>${[...new Set(places.map(p => p.loc?.country).filter(Boolean))].map(c => `<span class="chip">${esc(c)}</span>`).join('')}</div>
+      ${t.summary ? `<p class="prose" style="margin:0 0 12px;font-size:16px">${esc(t.summary)}</p>` : ''}
+      ${places.some(p => p.loc?.lat != null) ? `<div id="td-map"></div>` : ''}
+      ${places.length ? `<div class="subhead">${want ? '想去的地方' : '一路去了哪些地方'}</div><div class="place-list">${places.map((p, i) => `<div class="place-item"><span class="place-num">${i + 1}</span><div class="pi-main"><div class="pn">${esc(p.name)}${p.local ? ` <span class="muted" style="font-weight:400">${esc(p.local)}</span>` : ''}</div>${p.loc?.area ? `<div class="muted tiny">${esc(p.loc.area)}</div>` : ''}${p.note ? `<div class="tiny">${nl2br(p.note)}</div>` : ''}${strip(p.photos)}</div><div class="acts">${p.loc?.lat != null ? `<button class="btn small ghost" type="button" data-fly="${i}">在地图上看</button>` : ''}${gmapsButtons(p.loc)}</div></div>`).join('')}</div>` : ''}
+      ${t.story ? `<div class="subhead">游记</div><div class="prose">${nl2br(t.story)}</div>` : ''}
+      ${t.lu?.short || t.dan?.short ? `<div class="say">${['lu', 'dan'].map(w => t[w]?.short ? `<div class="say-col ${w}"><div class="say-head">${avatar(w, 40)}<span class="nm">${WHO[w]}最喜欢的瞬间</span></div><div class="say-bubble">${nl2br(t[w].short)}</div></div>` : '<div></div>').join('')}</div>` : ''}
+      ${t.photos?.length ? `<div class="subhead">其他照片 <span class="muted tiny">${t.photos.length} 张</span></div><div class="photo-grid">${t.photos.map((pid, i) => `<button type="button" data-pg="${i}">${imgTag(pid)}</button>`).join('')}</div>` : ''}`,
+    foot: `<button class="btn danger small left edit-only" type="button" data-x="del">删除</button><button class="btn edit-only" type="button" data-x="edit">编辑</button>${want ? '<button class="btn travel edit-only" type="button" data-x="went">去过了！</button>' : ''}`,
+  });
+  let mp = null;
+  if ($('#td-map', md.el)) {
+    mp = makeMap($('#td-map', md.el), { height: 340, initial: 'pins', fallback: 'asia', provinces: true, labelK: 20, photoK: 0, minSpan: 0.08, flat: true, views: [['pins', '这次的地方'], ['asia', '亚洲'], ['world', '世界']] });
+    const { pins, routes } = tripPinsRoutes([t], { numbered: true });
+    mp.setRoutes(routes); mp.setPins(pins);
+  }
+  wireGallery(md.el, t.photos || []);
+  md.el.addEventListener('click', async e => {
+    const fly = e.target.closest('[data-fly]');
+    if (fly && mp) { const p = places[+fly.dataset.fly]; mp.flyTo([p.loc.lng, p.loc.lat], isSG(p.loc.lng, p.loc.lat) ? 4000 : 2500); $('#td-map', md.el).scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'edit') { await md.close(true); tripForm(t); }
+    if (x === 'went') { await md.close(true); tripForm({ ...t, status: 'done', start: t.start || todayStr() }, { convert: true }); }
+    if (x === 'del') {
+      if (!(await confirmDialog(`删除「${t.title}」？里面所有景点的照片也会一起删掉，删了就找不回来了。`, { ok: '删除', danger: true }))) return;
+      try { await deleteDoc('trips', t, tripRefs(t)); md.close(true); toast('删掉了'); } catch (err) { handleWriteError(err); }
+    }
+  });
+}
+function tripForm(t = null, { status, convert = false } = {}) {
+  const isNew = !t?.id;
+  const d = t || { status: status || 'done', places: [] };
+  let places = JSON.parse(JSON.stringify(d.places || []));
+  const sessionNew = new Set();
+  const md = openModal({
+    title: isNew ? (d.status === 'want' ? '想去的地方' : '记一次旅行') : (convert ? '去过啦，记一下' : '编辑旅行'), wide: true,
+    body: `<form class="form" novalidate>
+      <div class="field"><span class="flabel">状态</span>${seg('tr-status', [['done', '去过'], ['want', '想去']], d.status || 'done')}</div>
+      <div class="field"><label for="tr-title">名字 <b class="req">*</b></label><input id="tr-title" type="text" value="${esc(d.title || '')}" placeholder="比如：京都赏枫 · 2026 秋"></div>
+      <div class="row2"><div class="field"><label for="tr-start">出发</label><input id="tr-start" type="date" value="${esc(d.start || '')}"></div><div class="field"><label for="tr-end">回来</label><input id="tr-end" type="date" value="${esc(d.end || '')}"></div></div>
+      <div class="field"><label for="tr-sum">一句话</label><input id="tr-sum" type="text" maxlength="140" value="${esc(d.summary || '')}" placeholder="这次旅行用一句话说"></div>
+      <fieldset class="box"><legend>景点和地点（按游览顺序）</legend><div class="place-list" id="tr-places" data-places=""></div><button class="btn small" type="button" data-x="add-place" style="width:fit-content">＋ 添加景点</button>
+        <div class="hint done-only">每个景点可以放它自己的照片，地图上就会在那个位置显示出来。</div></fieldset>
+      <div class="field done-only"><span class="flabel">其他照片</span><div id="tr-photos"></div><div class="hint">不属于某个景点的照片放这里，比如路上、酒店。卡片封面优先用这里的第一张，没有的话用第一个景点的第一张。</div></div>
+      <div class="field done-only"><label for="tr-story">游记</label><textarea id="tr-story" rows="6" placeholder="想写多少写多少">${esc(d.story || '')}</textarea></div>
+      <div class="dual done-only">${['lu', 'dan'].map(w => `<div class="dual-col ${w}"><div class="dual-head">${avatar(w, 34)}<span>${WHO[w]}最喜欢的瞬间</span></div><textarea id="tr-${w}" rows="3" aria-label="${WHO[w]}最喜欢的瞬间">${esc(d[w]?.short || '')}</textarea></div>`).join('')}</div>
+    </form>`,
+    foot: `<button class="btn" type="button" data-x="cancel">取消</button><button class="btn travel" type="button" data-x="save">保存</button>`,
+  });
+  const root = md.el;
+  const pf = mountPhotoField($('#tr-photos', root), d.photos || [], { max: 60 });
+  const drawPlaces = () => {
+    const box = $('#tr-places', root); box.dataset.places = JSON.stringify(places);
+    box.innerHTML = places.length ? places.map((p, i) => `<div class="place-item"><span class="place-num">${i + 1}</span><div class="pi-main"><div class="pn">${esc(p.name)}${p.local ? ` <span class="muted" style="font-weight:400">${esc(p.local)}</span>` : ''}</div><div class="muted tiny">${esc(p.loc?.area || (p.loc?.lat != null ? '' : '还没定位置'))}${p.photos?.length ? ` · ${p.photos.length} 张照片` : ''}</div>
+        ${p.photos?.length ? `<div class="place-photos">${p.photos.slice(0, 6).map(r => `<span>${imgTag(r)}</span>`).join('')}</div>` : ''}</div>
+      <div class="acts">${i > 0 ? `<button class="btn small ghost" type="button" data-pu="${i}" aria-label="上移">↑</button>` : ''}<button class="btn small" type="button" data-pe="${i}">编辑</button><button class="btn small ghost" type="button" data-pd="${i}">移除</button></div></div>`).join('')
+      : `<div class="hint">还没有景点。一次旅行可以加好几个，比如 清水寺 → 伏见稻荷大社 → 鸭川。</div>`;
+  };
+  drawPlaces();
+  const sync = () => { const w = getSeg(root, 'tr-status') === 'want'; $$('.done-only', root).forEach(x => x.hidden = w); };
+  root.addEventListener('change', e => { if (e.target.name === 'tr-status') sync(); }); sync();
+  setTimeout(() => { md.guard = formGuard(root, serializeForm(root)); }, 0);
+  const original = tripRefs(t);
+  md.onClose = () => { if (!md.saved) { const orig = new Set(original); deleteRefs([...sessionNew, ...pf.uploaded()].filter(r => !orig.has(r))); } };
+  const ctx = () => ({ title: val(root, '#tr-title'), names: places.map(p => p.name), want: getSeg(root, 'tr-status') === 'want' });
+  root.addEventListener('click', async e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.pe != null) { const i = +b.dataset.pe; return placeEditor(places[i], (p, news) => { news.forEach(r => sessionNew.add(r)); places[i] = p; drawPlaces(); }, places[i - 1]?.loc || places[i + 1]?.loc, ctx()); }
+    if (b.dataset.pd != null) {
+      const i = +b.dataset.pd;
+      if (places[i].photos?.length && !(await confirmDialog(`移除「${places[i].name}」？它的 ${places[i].photos.length} 张照片会在保存后一起删掉。`, { ok: '移除', danger: true }))) return;
+      places.splice(i, 1); drawPlaces(); return;
+    }
+    if (b.dataset.pu != null) { const i = +b.dataset.pu; [places[i - 1], places[i]] = [places[i], places[i - 1]]; drawPlaces(); return; }
+    const x = b.dataset.x; if (!x) return;
+    if (x === 'add-place') return placeEditor(null, (p, news) => { news.forEach(r => sessionNew.add(r)); places.push(p); drawPlaces(); }, places[places.length - 1]?.loc, ctx());
+    if (x === 'cancel') return md.close();
+    if (x !== 'save') return;
+    const title = val(root, '#tr-title'); if (!title) return fieldError(root, '#tr-title', '名字还没填');
+    if (pf.busy()) return toast('照片还在上传，稍等一下');
+    const st = getSeg(root, 'tr-status');
+    const doc = { title, status: st, start: val(root, '#tr-start'), end: val(root, '#tr-end'), summary: val(root, '#tr-sum'), places };
+    if (doc.end && doc.start && doc.end < doc.start) return fieldError(root, '#tr-end', '回来的日子比出发还早');
+    if (st === 'done') Object.assign(doc, { photos: pf.get(), story: val(root, '#tr-story'), lu: { short: val(root, '#tr-lu') }, dan: { short: val(root, '#tr-dan') } });
+    else Object.assign(doc, { photos: t?.photos || [], story: t?.story || '', lu: t?.lu || null, dan: t?.dan || null });
+    b.disabled = true;
+    try {
+      const id = await saveDoc('trips', t?.id, doc, t); md.saved = true; if (!isNew) reopen(() => openTrip(id));
+      const keep = new Set(tripRefs(doc));
+      await deleteRefs([...new Set([...original, ...sessionNew, ...pf.uploaded()])].filter(r => !keep.has(r)));
+      md.close(true); toast('记好啦'); S.ui.travel.tab = st; if (route() === 'travel') VIEW.travel.update();
+    } catch (err) { b.disabled = false; handleWriteError(err); }
+  });
+}
+function placeEditor(p, onSave, nearLoc, ctx = {}) {
+  const d = p || {};
+  const nearSG = nearLoc && isSG(nearLoc.lng, nearLoc.lat);
+  const md = openModal({
+    title: p ? '编辑景点' : '添加景点', wide: true,
+    body: `<div class="form">
+      <div class="row2"><div class="field"><label for="pl-name">名字 <b class="req">*</b></label><input id="pl-name" type="text" value="${esc(d.name || '')}" placeholder="比如：伏见稻荷大社"></div>
+        <div class="field"><label for="pl-local">当地叫法</label><input id="pl-local" type="text" value="${esc(d.local || '')}" placeholder="比如：伏見稲荷大社"></div></div>
+      <fieldset class="box"><legend>位置</legend><div id="pl-loc"></div></fieldset>
+      ${ctx.want ? '' : `<div class="field"><span class="flabel">在这里拍的照片</span><div id="pl-photos"></div><div class="hint">第一张会显示在地图上。</div></div>`}
+      <div class="field"><label for="pl-note">备注</label><textarea id="pl-note" rows="2" placeholder="在这里做了什么、吃了什么">${esc(d.note || '')}</textarea></div>
+    </div>`,
+    foot: `<button class="btn" type="button" data-x="cancel">取消</button><button class="btn travel" type="button" data-x="ok">好了</button>`,
+  });
+  const root = md.el;
+  const pf = $('#pl-photos', root) ? mountPhotoField($('#pl-photos', root), d.photos || [], { max: 40 }) : null;
+  const lp = mountLocationPicker($('#pl-loc', root), d.loc, {
+    view: nearLoc ? (nearSG ? 'sg' : 'asia') : 'asia',
+    onName: ({ name, local }) => { const n = $('#pl-name', root), l = $('#pl-local', root); if (!n.value.trim()) n.value = name; if (!l.value.trim() && local && local !== n.value.trim()) l.value = local; },
+    getName: () => val(root, '#pl-name'),
+    hint: () => [ctx.title ? `这是旅行「${ctx.title}」里的一个景点或地点。` : '这是一次旅行中的一个景点或地点。', ctx.names?.length ? `同一次旅行的其他地点：${ctx.names.filter(Boolean).slice(0, 12).join('、')}。` : '', nearLoc?.area ? `上一个地点在 ${nearLoc.area}。` : ''].join(''),
+  });
+  if (!d.loc && nearLoc?.lat != null) setTimeout(() => lp.map.readyP.then(() => lp.map.flyTo([nearLoc.lng, nearLoc.lat], nearSG ? 1400 : Math.max(60, (lp.map.W || 600) * 0.4), false)), 0);
+  setTimeout(() => { md.guard = formGuard(root, serializeForm(root)); }, 0);
+  md.onClose = () => { if (!md.saved) pf?.cleanup(false); };
+  root.addEventListener('click', e => {
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'cancel') return md.close();
+    const name = val(root, '#pl-name'); if (!name) return fieldError(root, '#pl-name', '名字还没填');
+    if (pf?.busy()) return toast('照片还在上传，稍等一下');
+    md.saved = true;
+    onSave({ name, local: val(root, '#pl-local'), note: val(root, '#pl-note'), loc: lp.get(), photos: pf ? pf.get() : (d.photos || []) }, pf ? pf.uploaded() : []);
+    md.close(true);
+  });
+}
+
+/* ---------- INVEST (editors only) ---------- */
+const INV_TYPES = [['stock', '股票'], ['etf', 'ETF'], ['fund', '基金'], ['crypto', '加密货币'], ['bond', '债券'], ['deposit', '存款/理财'], ['other', '其他']];
+const INV_TYPE = Object.fromEntries(INV_TYPES);
+const TX_KINDS = [['buy', '买入'], ['sell', '卖出'], ['div', '分红/利息'], ['fee', '费用']];
+const TX_KIND = Object.fromEntries(TX_KINDS);
+const pref = (k, d) => { try { return localStorage.getItem('lbd-' + k) ?? d; } catch { return d; } };
+const setPref = (k, v) => { try { localStorage.setItem('lbd-' + k, v); } catch {} };
+const masked = () => pref('mask', '0') === '1';
+function calcInv(it) {
+  const tx = [...(it.txns || [])].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  let qty = 0, cost = 0, realized = 0, div = 0, bought = 0, firstBuy = '', lastDate = '';
+  for (const t of tx) {
+    const q = +t.qty || 0, p = +t.price || 0, f = +t.fee || 0, a = +t.amount || 0;
+    if (t.date) lastDate = t.date;
+    if (t.kind === 'buy') { cost += q * p + f; qty += q; bought += q * p + f; firstBuy = firstBuy || t.date || ''; }
+    else if (t.kind === 'sell') { const avg = qty > 0 ? cost / qty : 0; const qq = Math.min(q, qty); realized += qq * p - f - avg * qq; cost -= avg * qq; qty -= qq; if (qty < 1e-9) { qty = 0; cost = 0; } }
+    else if (t.kind === 'div') div += a;
+    else if (t.kind === 'fee') realized -= a;
+  }
+  const price = it.price === '' || it.price == null ? null : +it.price;
+  const value = price != null && qty > 0 ? qty * price : null;
+  const unreal = value != null ? value - cost : null;
+  return { qty, cost, avg: qty > 0 ? cost / qty : 0, realized, div, bought, value, unreal, open: qty > 0, firstBuy, lastDate, total: realized + div + (unreal || 0) };
+}
+function money(v, cur, { sign = false, dp = 2 } = {}) {
+  if (v == null || isNaN(v)) return '—';
+  if (masked()) return '••••';
+  const s = Math.abs(v).toLocaleString('en', { minimumFractionDigits: Math.abs(v) >= 1000 ? 0 : Math.min(dp, 2), maximumFractionDigits: Math.abs(v) >= 1000 ? 0 : dp });
+  return `${sign ? (v > 0 ? '+' : v < 0 ? '−' : '') : (v < 0 ? '−' : '')}${CUR[cur] || ''}${s}`;
+}
+const qtyFmt = q => masked() ? '••' : (+q).toLocaleString('en', { maximumFractionDigits: 6 });
+const pct = (a, b) => (a == null || !b) ? '' : `${a >= 0 ? '+' : '−'}${Math.abs(a / b * 100).toFixed(1)}%`;
+const pnlCls = v => v == null || Math.abs(v) < 1e-9 ? '' : (v > 0) === (pref('colors', 'cn') === 'cn') ? 'pnl-red' : 'pnl-green';
+function investCardHTML() {
+  const open = S.invest.filter(i => calcInv(i).open), closed = S.invest.filter(i => !calcInv(i).open && (i.txns || []).length);
+  const last = [...S.invest].sort((a, b) => (calcInv(b).lastDate || '').localeCompare(calcInv(a).lastDate || ''))[0];
+  return `<a class="card dcard invest admin-only" href="#invest"><div class="dcard-top">${iconInvest(58)}<h2>噜蛋投资部</h2></div>
+    <div class="stat">持有 <b>${open.length}</b> 个 · 已清仓 <b>${closed.length}</b> 个</div>
+    <div class="latest">${last ? `最近一笔：${esc(last.name)} ${fmtDate(calcInv(last).lastDate)}` : '只有噜和蛋看得到'}</div></a>`;
+}
+VIEW.invest = {
+  mount(v) {
+    const u = S.ui.invest;
+    v.innerHTML = `<div class="district-head">${iconInvest(72)}<div><h1>噜蛋投资部</h1><p>每一笔买卖和当时的想法。只有噜和蛋看得到，游客看不到这里</p></div>
+        <div class="head-actions"><button class="btn invest edit-only admin-only" type="button" data-act="new-inv">＋ 记一个投资</button></div></div>
+      <div id="inv-lock"></div>
+      <div id="inv-summary" class="inv-summary"></div>
+      <div class="toolbar">
+        <div class="tabs" id="inv-tabs"><button type="button" data-tab="open">持有中</button><button type="button" data-tab="closed">已清仓</button><button type="button" data-tab="all">全部</button></div>
+        <select class="sel" id="inv-who" aria-label="谁的投资"><option value="">噜和蛋</option><option value="lu">噜的</option><option value="dan">蛋的</option><option value="both">一起的</option></select>
+        <select class="sel" id="inv-sort" aria-label="排序"><option value="recent">最近交易</option><option value="value">投入最多</option><option value="pnl">赚得最多</option><option value="loss">亏得最多</option></select>
+        <span style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn small" type="button" id="inv-mask" aria-pressed="${masked()}">${masked() ? '显示金额' : '金额打码'}</button>
+          <select class="sel" id="inv-colors" aria-label="涨跌颜色"><option value="cn">红涨绿跌</option><option value="intl">绿涨红跌</option></select>
+        </span>
+      </div>
+      <div id="inv-list"></div>`;
+    $('#inv-who').value = u.who; $('#inv-sort').value = u.sort; $('#inv-colors').value = pref('colors', 'cn');
+    $('#inv-tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { u.tab = b.dataset.tab; this.update(); } });
+    $('#inv-who').addEventListener('change', e => { u.who = e.target.value; this.update(); });
+    $('#inv-sort').addEventListener('change', e => { u.sort = e.target.value; this.update(); });
+    $('#inv-colors').addEventListener('change', e => { setPref('colors', e.target.value); this.update(); });
+    $('#inv-mask').addEventListener('click', e => { setPref('mask', masked() ? '0' : '1'); e.target.textContent = masked() ? '显示金额' : '金额打码'; e.target.setAttribute('aria-pressed', masked()); this.update(); });
+  },
+  update() {
+    const u = S.ui.invest;
+    if (S.isAdmin === false) {
+      $('#inv-lock').innerHTML = emptyState('这里只对城主开放', '投资部只有噜和蛋登录以后才能看到。');
+      ['#inv-summary', '#inv-list'].forEach(sel => $(sel).innerHTML = ''); $('.toolbar').hidden = true; return;
+    }
+    const rows = S.invest.map(it => ({ it, c: calcInv(it) }));
+    // summary per currency
+    const byCur = {};
+    for (const { it, c } of rows) {
+      if (u.who && it.owner !== u.who) continue;
+      const k = it.currency || 'SGD';
+      const b = byCur[k] ||= { cost: 0, value: 0, valueKnown: true, unreal: 0, realized: 0, div: 0, open: 0 };
+      b.realized += c.realized; b.div += c.div;
+      if (c.open) { b.open++; b.cost += c.cost; if (c.value == null) b.valueKnown = false; else { b.value += c.value; b.unreal += c.unreal; } }
+    }
+    const curs = Object.keys(byCur);
+    $('#inv-summary').innerHTML = curs.length ? curs.map(k => { const b = byCur[k]; return `<div class="card inv-tile"><div class="inv-cur">${k} <span class="muted tiny">${b.open} 个持有中</span></div>
+        <div class="inv-grid"><div><span class="muted tiny">持仓成本</span><b class="num">${b.open ? money(b.cost, k) : '—'}</b></div>
+          <div><span class="muted tiny">市值${b.valueKnown ? '' : '（部分没填现价）'}</span><b class="num">${b.open ? money(b.value, k) : '—'}</b></div>
+          <div><span class="muted tiny">浮动盈亏</span><b class="num ${pnlCls(b.unreal)}">${b.open ? money(b.unreal, k, { sign: true }) : '—'}</b></div>
+          <div><span class="muted tiny">已实现盈亏</span><b class="num ${pnlCls(b.realized)}">${money(b.realized, k, { sign: true })}</b></div>
+          <div><span class="muted tiny">分红/利息</span><b class="num">${money(b.div, k)}</b></div></div></div>`; }).join('') : '';
+    const counts = { open: rows.filter(r => r.c.open).length, closed: rows.filter(r => !r.c.open).length, all: rows.length };
+    const names = { open: '持有中', closed: '已清仓', all: '全部' };
+    $$('#inv-tabs button').forEach(b => { b.setAttribute('aria-pressed', b.dataset.tab === u.tab); b.textContent = `${names[b.dataset.tab]} ${counts[b.dataset.tab]}`; });
+    let list = rows.filter(r => u.tab === 'all' || (u.tab === 'open' ? r.c.open : !r.c.open));
+    if (u.who) list = list.filter(r => r.it.owner === u.who);
+    const by = {
+      recent: (a, b) => (b.c.lastDate || '').localeCompare(a.c.lastDate || ''),
+      value: (a, b) => b.c.bought - a.c.bought, pnl: (a, b) => b.c.total - a.c.total, loss: (a, b) => a.c.total - b.c.total,
+    };
+    list.sort(by[u.sort] || by.recent);
+    const el = $('#inv-list');
+    if (!list.length) {
+      el.innerHTML = loadingOr('invest', rows.length ? `<div class="empty">这一栏还没有记录。</div>` : emptyState('投资部还没开张', '记下第一笔投资：买了什么、为什么买，之后的每一笔加仓、卖出、分红都记在它下面。', `<button class="btn invest edit-only" type="button" data-act="new-inv">＋ 记一个投资</button>`));
+      return;
+    }
+    el.innerHTML = `<div class="inv-list">${list.map(({ it, c }) => { const cur = it.currency || 'SGD'; return `<button type="button" class="card inv-card" data-act="open-inv" data-id="${esc(it.id)}">
+        <div class="inv-head"><div><div class="inv-name">${esc(it.name)}${it.symbol ? ` <span class="chip">${esc(it.symbol)}</span>` : ''}</div>
+          <div class="row tiny muted">${INV_TYPE[it.type] || '其他'}${it.platform ? ' · ' + esc(it.platform) : ''} · ${it.owner === 'both' ? '一起' : (WHO[it.owner] || '一起') + '的'}${c.lastDate ? ' · 最近 ' + fmtDate(c.lastDate) : ''}</div></div>
+          ${c.open ? '<span class="chip invest">持有中</span>' : '<span class="chip">已清仓</span>'}</div>
+        ${c.open ? `<div class="inv-nums"><div><span class="muted tiny">持有 / 均价</span><b class="num">${qtyFmt(c.qty)}</b><small class="num muted">均价 ${money(c.avg, cur, { dp: 4 })}</small></div>
+            <div><span class="muted tiny">现价${it.priceDate ? ' · ' + fmtDate(it.priceDate) : ''}</span><b class="num">${it.price != null && it.price !== '' ? money(+it.price, cur, { dp: 4 }) : '没填'}</b></div>
+            <div><span class="muted tiny">浮动盈亏</span><b class="num ${pnlCls(c.unreal)}">${c.unreal != null ? money(c.unreal, cur, { sign: true }) + ` <small>${pct(c.unreal, c.cost)}</small>` : '—'}</b></div></div>`
+          : `<div class="inv-nums"><div><span class="muted tiny">总共投入</span><b class="num">${money(c.bought, cur)}</b></div><div><span class="muted tiny">总收益</span><b class="num ${pnlCls(c.total)}">${money(c.total, cur, { sign: true })} <small>${pct(c.total, c.bought)}</small></b></div><div><span class="muted tiny">持有时间</span><b class="num">${c.firstBuy && c.lastDate ? fmtDate(c.firstBuy) + ' – ' + fmtDate(c.lastDate) : '—'}</b></div></div>`}
+        ${it.thesis ? `<div class="tiny inv-thesis">${esc(it.thesis)}</div>` : ''}
+      </button>`; }).join('')}</div>`;
+  },
+};
+function openInvest(id) {
+  const it = S.invest.find(x => x.id === id); if (!it) return;
+  const c = calcInv(it), cur = it.currency || 'SGD';
+  const tx = [...(it.txns || [])].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  const md = openModal({
+    title: '投资', wide: true,
+    body: `<h3 style="font-size:28px">${esc(it.name)} ${it.symbol ? `<span class="chip">${esc(it.symbol)}</span>` : ''}</h3>
+      <div class="chips" style="margin:8px 0 14px"><span class="chip invest">${INV_TYPE[it.type] || '其他'}</span>${it.market ? `<span class="chip">${esc(it.market)}</span>` : ''}${it.platform ? `<span class="chip">${esc(it.platform)}</span>` : ''}<span class="chip">${it.owner === 'both' ? '噜和蛋一起' : (WHO[it.owner] || '一起') + '的'}</span><span class="chip">${cur}</span>${c.open ? '<span class="chip invest">持有中</span>' : '<span class="chip">已清仓</span>'}</div>
+      <div class="inv-grid big">
+        ${c.open ? `<div><span class="muted tiny">持有数量</span><b class="num">${qtyFmt(c.qty)}</b></div><div><span class="muted tiny">平均成本</span><b class="num">${money(c.avg, cur, { dp: 4 })}</b></div><div><span class="muted tiny">持仓成本</span><b class="num">${money(c.cost, cur)}</b></div>
+          <div><span class="muted tiny">现价${it.priceDate ? ' · ' + fmtDate(it.priceDate) : ''}</span><b class="num">${it.price != null && it.price !== '' ? money(+it.price, cur, { dp: 4 }) : '没填'}</b></div><div><span class="muted tiny">市值</span><b class="num">${money(c.value, cur)}</b></div><div><span class="muted tiny">浮动盈亏</span><b class="num ${pnlCls(c.unreal)}">${money(c.unreal, cur, { sign: true })} <small>${pct(c.unreal, c.cost)}</small></b></div>` : ''}
+        <div><span class="muted tiny">已实现盈亏</span><b class="num ${pnlCls(c.realized)}">${money(c.realized, cur, { sign: true })}</b></div><div><span class="muted tiny">分红/利息</span><b class="num">${money(c.div, cur)}</b></div><div><span class="muted tiny">总收益</span><b class="num ${pnlCls(c.total)}">${money(c.total, cur, { sign: true })} <small>${pct(c.total, c.bought)}</small></b></div>
+      </div>
+      ${c.open ? `<div class="price-quick edit-only"><label for="iq-price" class="flabel">更新现价</label><input id="iq-price" type="number" step="any" inputmode="decimal" value="${esc(it.price ?? '')}"><input id="iq-date" type="date" value="${todayStr()}" aria-label="现价日期"><button class="btn small" type="button" data-x="price">更新</button></div>` : ''}
+      ${it.thesis ? `<div class="subhead">为什么买</div><div class="prose">${nl2br(it.thesis)}</div>` : ''}
+      ${it.review ? `<div class="subhead">复盘</div><div class="prose">${nl2br(it.review)}</div>` : ''}
+      <div class="subhead">交易记录 <span class="muted tiny">${tx.length} 笔</span></div>
+      ${tx.length ? `<div class="tx-table-wrap"><table class="tx-table"><thead><tr><th>日期</th><th>类型</th><th>数量</th><th>价格</th><th>费用/金额</th><th>备注</th></tr></thead><tbody>${tx.map(t => `<tr><td class="num">${fmtDate(t.date)}</td><td><span class="tx-kind ${t.kind}">${TX_KIND[t.kind] || ''}</span></td><td class="num">${['buy', 'sell'].includes(t.kind) ? qtyFmt(t.qty || 0) : ''}</td><td class="num">${['buy', 'sell'].includes(t.kind) ? money(+t.price || 0, cur, { dp: 4 }) : ''}</td><td class="num">${['div', 'fee'].includes(t.kind) ? money(+t.amount || 0, cur) : (+t.fee ? money(+t.fee, cur) : '')}</td><td>${esc(t.note || '')}</td></tr>`).join('')}</tbody></table></div>` : '<div class="muted">还没有交易记录。</div>'}`,
+    foot: `<button class="btn danger small left edit-only" type="button" data-x="del">删除</button><button class="btn edit-only" type="button" data-x="edit">编辑 / 记一笔交易</button>`,
+  });
+  md.el.addEventListener('click', async e => {
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'edit') { await md.close(true); investForm(it); }
+    if (x === 'price') {
+      const p = val(md.el, '#iq-price'); if (p === '' || isNaN(+p)) return fieldError(md.el, '#iq-price', '填一个数字');
+      try { await saveDoc(INVEST_COL, it.id, { ...it, id: undefined, price: +p, priceDate: val(md.el, '#iq-date') }, it); await md.close(true); toast('现价更新好了'); openInvest(it.id); } catch (err) { handleWriteError(err); }
+    }
+    if (x === 'del') {
+      if (!(await confirmDialog(`删除「${it.name}」和它的全部交易记录？删了就找不回来了。`, { ok: '删除', danger: true }))) return;
+      try { await deleteDoc(INVEST_COL, it, []); md.close(true); toast('删掉了'); } catch (err) { handleWriteError(err); }
+    }
+  });
+}
+function txRowHTML(t = {}) {
+  const k = t.kind || 'buy';
+  return `<div class="tx-row" data-kind="${k}">
+    <input type="date" class="tx-date" value="${esc(t.date || todayStr())}" aria-label="日期">
+    <select class="tx-kind-sel" aria-label="类型">${TX_KINDS.map(([v, l]) => `<option value="${v}" ${v === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    <input type="number" step="any" min="0" inputmode="decimal" class="tx-qty" placeholder="数量" value="${esc(t.qty ?? '')}" aria-label="数量">
+    <input type="number" step="any" min="0" inputmode="decimal" class="tx-price" placeholder="成交价" value="${esc(t.price ?? '')}" aria-label="成交价">
+    <input type="number" step="any" min="0" inputmode="decimal" class="tx-fee" placeholder="手续费" value="${esc(t.fee ?? '')}" aria-label="手续费">
+    <input type="number" step="any" min="0" inputmode="decimal" class="tx-amount" placeholder="金额" value="${esc(t.amount ?? '')}" aria-label="金额">
+    <input type="text" class="tx-note" placeholder="当时的想法" value="${esc(t.note || '')}" aria-label="备注">
+    <button type="button" class="btn small ghost tx-del" aria-label="删除这一笔">×</button></div>`;
+}
+function readTxns(root) {
+  return $$('.tx-row', root).map(r => {
+    const kind = $('.tx-kind-sel', r).value, num = sel => { const v = $(sel, r).value; return v === '' ? null : +v; };
+    const t = { date: $('.tx-date', r).value, kind, note: $('.tx-note', r).value.trim() };
+    if (kind === 'buy' || kind === 'sell') Object.assign(t, { qty: num('.tx-qty'), price: num('.tx-price'), fee: num('.tx-fee') });
+    else t.amount = num('.tx-amount');
+    return t;
+  }).filter(t => (t.kind === 'buy' || t.kind === 'sell') ? t.qty : t.amount);
+}
+function investForm(it = null) {
+  const isNew = !it?.id;
+  const d = it || { type: 'stock', currency: 'SGD', owner: 'both', txns: [{ kind: 'buy', date: todayStr() }] };
+  const md = openModal({
+    title: isNew ? '记一个投资' : '编辑投资', wide: true,
+    body: `<form class="form" novalidate>
+      <div class="row2"><div class="field"><label for="iv-name">名字 <b class="req">*</b></label><input id="iv-name" type="text" value="${esc(d.name || '')}" placeholder="比如：STI ETF、苹果、定期存款"></div>
+        <div class="field"><label for="iv-sym">代码</label><input id="iv-sym" type="text" value="${esc(d.symbol || '')}" placeholder="比如：ES3、AAPL，可以不填"></div></div>
+      <div class="field"><span class="flabel">类型</span>${seg('iv-type', INV_TYPES, d.type || 'stock')}</div>
+      <div class="row3"><div class="field"><label for="iv-cur">币种</label><select id="iv-cur">${Object.keys(CUR).map(c => `<option value="${c}" ${c === (d.currency || 'SGD') ? 'selected' : ''}>${c} ${CUR[c]}</option>`).join('')}</select></div>
+        <div class="field"><label for="iv-plat">平台</label><input id="iv-plat" type="text" value="${esc(d.platform || '')}" placeholder="比如：moomoo、银行"></div>
+        <div class="field"><label for="iv-mkt">市场</label><input id="iv-mkt" type="text" value="${esc(d.market || '')}" placeholder="比如：新加坡、美股"></div></div>
+      <div class="field"><span class="flabel">谁的</span>${seg('iv-owner', [['lu', '噜'], ['dan', '蛋'], ['both', '一起']], d.owner || 'both')}</div>
+      <fieldset class="box"><legend>交易记录</legend>
+        <div class="tx-legend tiny muted">买入/卖出填「数量 + 成交价 + 手续费」；分红/利息、费用只填「金额」。</div>
+        <div id="iv-tx">${(d.txns || []).map(txRowHTML).join('')}</div>
+        <button class="btn small" type="button" data-x="add-tx" style="width:fit-content">＋ 再记一笔</button>
+        <div class="tx-preview tiny" id="iv-preview"></div></fieldset>
+      <div class="row2"><div class="field"><label for="iv-price">现价</label><input id="iv-price" type="number" step="any" min="0" inputmode="decimal" value="${esc(d.price ?? '')}" placeholder="用来算浮动盈亏，可以不填"></div>
+        <div class="field"><label for="iv-pdate">现价日期</label><input id="iv-pdate" type="date" value="${esc(d.priceDate || todayStr())}"></div></div>
+      <div class="field"><label for="iv-thesis">为什么买</label><textarea id="iv-thesis" rows="3" placeholder="当时的理由、预期、打算拿多久">${esc(d.thesis || '')}</textarea></div>
+      <div class="field"><label for="iv-review">复盘</label><textarea id="iv-review" rows="3" placeholder="卖出之后回头看：做对了什么、下次要注意什么">${esc(d.review || '')}</textarea></div>
+    </form>`,
+    foot: `<button class="btn" type="button" data-x="cancel">取消</button><button class="btn invest" type="button" data-x="save">保存</button>`,
+  });
+  const root = md.el;
+  const preview = () => {
+    const c = calcInv({ txns: readTxns(root), price: val(root, '#iv-price') }), cur = $('#iv-cur', root).value;
+    $('#iv-preview', root).innerHTML = `按这些记录：${c.open ? `持有 <b class="num">${qtyFmt(c.qty)}</b>，平均成本 <b class="num">${money(c.avg, cur, { dp: 4 })}</b>，` : '已经全部卖出，'}已实现盈亏 <b class="num ${pnlCls(c.realized)}">${money(c.realized, cur, { sign: true })}</b>${c.div ? `，分红/利息 <b class="num">${money(c.div, cur)}</b>` : ''}${c.unreal != null ? `，浮动盈亏 <b class="num ${pnlCls(c.unreal)}">${money(c.unreal, cur, { sign: true })}</b>` : ''}。`;
+    $$('.tx-row', root).forEach(r => r.dataset.kind = $('.tx-kind-sel', r).value);
+  };
+  root.addEventListener('input', preview); root.addEventListener('change', preview); preview();
+  setTimeout(() => { md.guard = formGuard(root, serializeForm(root)); }, 0);
+  root.addEventListener('click', async e => {
+    if (e.target.closest('.tx-del')) { e.target.closest('.tx-row').remove(); preview(); return; }
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'add-tx') { $('#iv-tx', root).insertAdjacentHTML('beforeend', txRowHTML({ kind: 'buy' })); preview(); $('#iv-tx .tx-row:last-child .tx-qty', root)?.focus(); return; }
+    if (x === 'cancel') return md.close();
+    if (x !== 'save') return;
+    const name = val(root, '#iv-name'); if (!name) return fieldError(root, '#iv-name', '名字还没填');
+    const p = val(root, '#iv-price');
+    const doc = { name, symbol: val(root, '#iv-sym'), type: getSeg(root, 'iv-type'), currency: $('#iv-cur', root).value, platform: val(root, '#iv-plat'), market: val(root, '#iv-mkt'), owner: getSeg(root, 'iv-owner'),
+      txns: readTxns(root), price: p === '' ? null : +p, priceDate: val(root, '#iv-pdate'), thesis: val(root, '#iv-thesis'), review: val(root, '#iv-review') };
+    const btn = e.target.closest('button'); btn.disabled = true;
+    try { const id = await saveDoc(INVEST_COL, it?.id, doc, it); md.saved = true; md.close(true); toast('记好啦'); reopen(() => openInvest(id)); if (route() === 'invest') VIEW.invest.update(); }
+    catch (err) { btn.disabled = false; handleWriteError(err); }
+  });
+}
+
+/* ---------- hero text ---------- */
+const HERO_DEFAULT = { headline: '欢迎来到噜包蛋之城', motto: '这里住着一只水豚和一颗蛋，记录一起看的电影、吃的饭、去过的地方。', bubble: '欢迎光临！' };
+function openHeroEditor() {
+  const md = openModal({
+    title: '改城门上的字',
+    body: `<div class="form">
+      <div class="field"><label for="he-head">大标题</label><input id="he-head" type="text" maxlength="30" value="${esc(S.meta?.headline || '')}" placeholder="${esc(HERO_DEFAULT.headline)}"></div>
+      <div class="field"><label for="he-motto">标语</label><textarea id="he-motto" rows="3" maxlength="200" placeholder="${esc(HERO_DEFAULT.motto)}">${esc(S.meta?.motto || '')}</textarea><div class="hint">可以换行。留空就用默认的这句。</div></div>
+      <div class="field"><label for="he-bubble">气泡里的话</label><input id="he-bubble" type="text" maxlength="16" value="${esc(S.meta?.bubble || '')}" placeholder="${esc(HERO_DEFAULT.bubble)}"></div>
+    </div>`,
+    foot: `<button class="btn ghost left" type="button" data-x="reset">全部换回默认</button><button class="btn" type="button" data-x="cancel">取消</button><button class="btn primary" type="button" data-x="save">保存</button>`,
+  });
+  md.el.addEventListener('click', async e => {
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'cancel') return md.close(true);
+    if (x === 'reset') { $$('input,textarea', md.el).forEach(i => i.value = ''); return; }
+    try { await saveMeta({ headline: val(md.el, '#he-head'), motto: val(md.el, '#he-motto'), bubble: val(md.el, '#he-bubble') }); md.close(true); toast('城门换好了'); refresh(); }
+    catch (err) { handleWriteError(err); }
+  });
+}
+
+/* ---------- avatar cutout: remove the plain background around a character ---------- */
+async function loadBitmap(blob, max = 900) {
+  const bmp = await createImageBitmap(blob, { imageOrientation: 'from-image' });
+  const r = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bmp.width * r); c.height = Math.round(bmp.height * r);
+  const ctx = c.getContext('2d', { willReadFrequently: true }); ctx.drawImage(bmp, 0, 0, c.width, c.height);
+  return ctx.getImageData(0, 0, c.width, c.height);
+}
+function cutout(img, tol, keepLargest) {
+  const { width: w, height: h, data: src } = img, N = w * h;
+  // background colour = the most common colour along the border
+  const buckets = new Map();
+  const border = [];
+  for (let x = 0; x < w; x++) border.push(x, (h - 1) * w + x);
+  for (let y = 1; y < h - 1; y++) border.push(y * w, y * w + w - 1);
+  for (const i of border) { const p = i * 4; if (src[p + 3] < 20) continue; const k = (src[p] >> 4) << 8 | (src[p + 1] >> 4) << 4 | (src[p + 2] >> 4); const b = buckets.get(k) || [0, 0, 0, 0]; b[0] += src[p]; b[1] += src[p + 1]; b[2] += src[p + 2]; b[3]++; buckets.set(k, b); }
+  let best = [255, 255, 255, 1]; for (const b of buckets.values()) if (b[3] > best[3]) best = b;
+  const bg = [best[0] / best[3], best[1] / best[3], best[2] / best[3]];
+  const dist = i => { const p = i * 4; return Math.hypot(src[p] - bg[0], src[p + 1] - bg[1], src[p + 2] - bg[2]); };
+  const isBg = new Uint8Array(N), stack = [];
+  const test = i => src[i * 4 + 3] < 20 || dist(i) < tol;
+  for (const i of border) if (!isBg[i] && test(i)) { isBg[i] = 1; stack.push(i); }
+  while (stack.length) {
+    const i = stack.pop(), x = i % w;
+    for (const n of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w]) if (n >= 0 && n < N && !isBg[n] && test(n)) { isBg[n] = 1; stack.push(n); }
+  }
+  if (keepLargest) {
+    const lab = new Int32Array(N); let bestL = 0, bestN = 0, L = 0;
+    for (let s0 = 0; s0 < N; s0++) {
+      if (isBg[s0] || lab[s0]) continue;
+      L++; let cnt = 0; const st = [s0]; lab[s0] = L;
+      while (st.length) { const i = st.pop(), x = i % w; cnt++; for (const n of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w]) if (n >= 0 && n < N && !isBg[n] && !lab[n]) { lab[n] = L; st.push(n); } }
+      if (cnt > bestN) { bestN = cnt; bestL = L; }
+    }
+    for (let i = 0; i < N; i++) if (!isBg[i] && lab[i] !== bestL) isBg[i] = 1;
+  }
+  const out = new ImageData(new Uint8ClampedArray(src), w, h), o = out.data;
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let i = 0; i < N; i++) {
+    const x = i % w, y = (i / w) | 0;
+    if (isBg[i]) { o[i * 4 + 3] = 0; continue; }
+    // soften the edge: pixels touching the background that are still close to its colour fade out a little
+    const edge = (x > 0 && isBg[i - 1]) || (x < w - 1 && isBg[i + 1]) || (i >= w && isBg[i - w]) || (i + w < N && isBg[i + w]);
+    if (edge) { const d = dist(i); if (d < tol * 1.8) o[i * 4 + 3] = Math.round(o[i * 4 + 3] * Math.max(0.35, Math.min(1, (d - tol) / (tol * 0.8) + 0.35))); }
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  if (x1 < 0) return null;
+  const bw = x1 - x0 + 1, bh = y1 - y0 + 1, side = Math.round(Math.max(bw, bh) * 1.06);
+  const tmp = document.createElement('canvas'); tmp.width = w; tmp.height = h; tmp.getContext('2d').putImageData(out, 0, 0);
+  const c = document.createElement('canvas'); c.width = side; c.height = side;
+  c.getContext('2d').drawImage(tmp, x0, y0, bw, bh, Math.round((side - bw) / 2), Math.round((side - bh) / 2), bw, bh);
+  return c;
+}
+function openCutout(blob, who) {
+  const md = openModal({
+    title: `${WHO[who]}的新头像`, wide: true,
+    body: `<div class="cut-wrap"><div class="cut-box"><span class="muted tiny">原图</span><img id="cut-orig" alt="原图"></div>
+        <div class="cut-box"><span class="muted tiny">去掉背景以后</span><canvas id="cut-cv" class="checker" width="300" height="300"></canvas></div></div>
+      <div class="cut-ctrl">
+        <label class="check"><input type="checkbox" id="cut-on" checked> 去掉背景色块，只保留形象</label>
+        <div class="field cut-opt"><label for="cut-tol">去背景的力度 <span class="muted tiny" id="cut-tv"></span></label><input type="range" id="cut-tol" min="4" max="90" value="28"><div class="hint">形象被吃掉了就往左拉；背景还有残留就往右拉。适合背景是纯色或接近纯色的图。</div></div>
+        <label class="check cut-opt"><input type="checkbox" id="cut-big" checked> 只保留最大的一块（去掉旁边零散的小装饰）</label>
+      </div>`,
+    foot: `<button class="btn" type="button" data-x="cancel">取消</button><button class="btn primary" type="button" data-x="ok">用这张</button>`,
+  });
+  const root = md.el, cv = $('#cut-cv', root);
+  const url = URL.createObjectURL(blob); $('#cut-orig', root).src = url;
+  let img = null, result = null, timer;
+  const draw = () => {
+    const on = $('#cut-on', root).checked; $$('.cut-opt', root).forEach(x => x.hidden = !on);
+    $('#cut-tv', root).textContent = $('#cut-tol', root).value;
+    if (!img) return;
+    if (on) result = cutout(img, +$('#cut-tol', root).value, $('#cut-big', root).checked);
+    else { result = document.createElement('canvas'); result.width = img.width; result.height = img.height; result.getContext('2d').putImageData(img, 0, 0); }
+    const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, 300, 300);
+    if (!result) { ctx.font = '14px sans-serif'; ctx.fillStyle = '#7A6552'; ctx.fillText('全被去掉了，往左拉一点', 60, 150); return; }
+    const r = Math.min(300 / result.width, 300 / result.height), dw = result.width * r, dh = result.height * r;
+    ctx.drawImage(result, (300 - dw) / 2, (300 - dh) / 2, dw, dh);
+  };
+  root.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(draw, 60); });
+  loadBitmap(blob).then(d => { img = d; draw(); }).catch(() => { toast('这张图打不开，换一张试试（HEIC 请先转成 JPG/PNG）', 'err'); md.close(true); });
+  md.onClose = () => URL.revokeObjectURL(url);
+  root.addEventListener('click', async e => {
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'cancel') return md.close(true);
+    if (!result) return toast('还没处理好，或者形象全被去掉了', 'err');
+    const btn = e.target.closest('button'); btn.disabled = true; btn.textContent = '上传中…';
+    try {
+      const cut = $('#cut-on', root).checked;
+      const png = await new Promise(res => result.toBlob(res, cut ? 'image/png' : 'image/jpeg', 0.9));
+      const ref = await uploadPhoto(new File([png], cut ? 'avatar.png' : 'avatar.jpg', { type: png.type }));
+      const old = S.meta?.['avatar_' + who];
+      await saveMeta({ ['avatar_' + who]: ref, ['avatar_' + who + '_style']: cut ? 'cut' : 'photo' });
+      if (old && old !== ref) await deleteRefs([old]);
+      md.close(true); toast('头像换好了'); refresh(); modalStack.find(m => m.isSettings)?.close(true); openSettings();
+    } catch (err) { btn.disabled = false; btn.textContent = '用这张'; if (err?.code) handleWriteError(err); else toast('上传失败，再试一次', 'err'); }
+  });
+}
+
+/* ---------- settings & export ---------- */
+function openSettings() {
+  const md = openModal({
+    title: '城市设置',
+    body: `<div class="form">
+      ${window.LBD_AUTH ? LBD_AUTH.html() : ''}
+      <div class="field"><label for="st-since">在一起的日子</label><input id="st-since" type="date" value="${esc(S.meta?.since || '')}"><div class="hint">首页会显示「噜和蛋在一起的第几天」。</div></div>
+      <div class="field edit-only"><span class="flabel">城门上的字</span><div><button class="btn small edit-only" type="button" data-act="edit-hero">✎ 改大标题、标语和气泡</button></div></div>
+      <div class="field"><span class="flabel">头像</span><div class="settings-av">${['lu', 'dan'].map(w => `<div class="one">${avatar(w, 72)}<span>${WHO[w]}</span>
+        <div class="btns edit-only">${S.assets ? `<label class="btn small" for="st-up-${w}">上传新头像</label><input id="st-up-${w}" class="visually-hidden" type="file" accept="image/*" data-who="${w}">` : ''}
+          ${S.meta?.['avatar_' + w] && S.assets ? `<button class="btn small" type="button" data-recut="${w}">给现在的头像去背景</button>` : ''}
+          ${S.meta?.['avatar_' + w] ? `<button class="btn small ghost" type="button" data-reset="${w}">换回默认画像</button>` : ''}</div></div>`).join('')}</div>
+        <div class="hint">上传后会自动去掉图片四周的纯色背景，只留下形象，还能调整力度。</div></div>
+      <div class="field"><span class="flabel">数据</span><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small" type="button" data-act="export">导出完整备份（记录 + 照片，.zip）</button>${window.LBD_AUTH ? LBD_AUTH.importHtml() : ''}</div><div class="hint" id="st-usage"></div></div>
+    </div>`,
+    foot: `<button class="btn" type="button" data-x="cancel">关闭</button><button class="btn primary edit-only" type="button" data-x="save">保存</button>`,
+  });
+  const root = md.el; md.isSettings = true;
+  if (!canEdit()) $$('input:not(#lbd-pass)', root).forEach(i => i.disabled = true);
+  root.addEventListener('change', e => { const f = e.target.files?.[0]; if (f && e.target.dataset.who) { openCutout(f, e.target.dataset.who); e.target.value = ''; } });
+  S.assets?.list?.().then(r => { const u = r.usage; if (u) $('#st-usage', root).textContent = `照片存储：已用 ${(u.bytes / 1048576).toFixed(1)} MB / ${(u.maxBytes / 1048576).toFixed(0)} MB，共 ${u.files} 个文件。`; }).catch(() => {});
+  root.addEventListener('click', async e => {
+    const rc = e.target.closest('[data-recut]');
+    if (rc) {
+      const w = rc.dataset.recut; rc.disabled = true;
+      try { const r = await fetch(imgUrl(S.meta['avatar_' + w])); if (!r.ok) throw 0; openCutout(await r.blob(), w); } catch { toast('现在的头像读不出来，重新上传一次吧', 'err'); }
+      rc.disabled = false; return;
+    }
+    const r = e.target.closest('[data-reset]');
+    if (r) {
+      const w = r.dataset.reset; if (!(await confirmDialog(`把${WHO[w]}换回默认画像？`, { ok: '换回默认' }))) return;
+      const old = S.meta['avatar_' + w];
+      try { await saveMeta({ ['avatar_' + w]: null, ['avatar_' + w + '_style']: null }); await deleteRefs([old]); toast('换回默认了'); refresh(); md.close(true); openSettings(); } catch (err) { handleWriteError(err); }
+      return;
+    }
+    const x = e.target.closest('[data-x]')?.dataset.x; if (!x) return;
+    if (x === 'cancel') return md.close(true);
+    try { await saveMeta({ since: val(root, '#st-since') }); md.close(true); toast('保存好了'); refresh(); }
+    catch (err) { handleWriteError(err); }
+  });
+}
+function loadScript(src) { return new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); }); }
+function allPhotoIds() {
+  const ids = new Set();
+  const add = r => refIds(r).forEach(i => ids.add(i));
+  for (const m of S.movies) if (m.poster) add(m.poster);
+  for (const m of S.meals) (m.photos || []).forEach(add);
+  for (const t of S.trips) tripRefs(t).forEach(add);
+  for (const w of ['lu', 'dan']) if (S.meta?.['avatar_' + w]) add(S.meta['avatar_' + w]);
+  return [...ids];
+}
+// full backup: data.json + every photo, as one zip (used to move the city to its own website)
+async function exportAll() {
+  const md = openModal({ title: '导出完整备份', body: `<p style="margin-top:0">会把所有记录和照片打包成一个 .zip 文件，可以用来备份，或者搬到独立网站。</p><div class="hint" id="ex-st">准备中…</div>` });
+  const st = $('#ex-st', md.el);
+  try {
+    if (typeof JSZip === 'undefined') await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+    const zip = new JSZip();
+    const ids = allPhotoIds(), photoTypes = {};
+    let n = 0, failed = 0;
+    for (const id of ids) {
+      st.textContent = `正在打包照片 ${++n} / ${ids.length}…`;
+      try { const r = await fetch(imgUrl(id)); if (!r.ok) throw 0; const b = await r.blob(); photoTypes[id] = b.type || 'image/jpeg'; zip.file('photos/' + id, b); } catch { failed++; }
+    }
+    const data = { app: '噜包蛋之城', format: 2, exportedAt: new Date().toISOString(), meta: S.meta, movies: S.movies, meals: S.meals, trips: S.trips, invest: S.invest, photoTypes };
+    zip.file('data.json', JSON.stringify(data, null, 2));
+    st.textContent = '正在压缩…';
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const fname = `luuegg-backup-${todayStr()}.zip`;
+    st.textContent = `打包好了：${S.movies.length} 部电影、${S.meals.length} 顿饭、${S.trips.length} 次旅行、${S.invest.length} 个投资、${ids.length - failed} 张照片${failed ? `（${failed} 张没读到）` : ''}。`;
+    if (S.downloads) { try { await S.downloads.save({ filename: fname, data: blob }); toast('导出好了'); } catch (e) { if (e?.code !== 'declined') toast('下载没成功，再点一次试试', 'err'); } }
+    else toast('这里没法下载文件', 'err');
+  } catch (e) { console.error(e); st.textContent = '打包失败了，刷新页面再试一次。'; }
+}
+
+/* ---------- global actions ---------- */
+document.addEventListener('click', async e => {
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act, id = a.dataset.id;
+  const needEdit = act.startsWith('new-');
+  if (needEdit && !canEdit()) { toast(S.backend === 'ok' ? '你现在只能看，不能添加。' : '还没连上数据库，没法保存。', 'err'); return; }
+  switch (act) {
+    case 'settings': openSettings(); break;
+    case 'edit-hero': if (!canEdit()) return toast('你现在只能看，不能修改。', 'err'); openHeroEditor(); break;
+    case 'export': exportAll(); break;
+    case 'new-movie': movieForm(null, { status: a.dataset.status }); break;
+    case 'new-meal': mealForm(null, { status: a.dataset.status }); break;
+    case 'new-trip': tripForm(null, { status: a.dataset.status }); break;
+    case 'new-inv': investForm(); break;
+    case 'open-inv': openInvest(id); break;
+    case 'open-movie': openMovie(id); break;
+    case 'open-meal': if (modalStack.length && a.closest('.roulette')) await modalStack[modalStack.length - 1].close(true); openMeal(id); break;
+    case 'open-trip': openTrip(id); break;
+    case 'roulette': openRoulette(); break;
+    case 'lb': openLightbox(LB.get(a.dataset.k) || [], +a.dataset.i || 0); break;
+  }
+});
+
+/* ---------- boot ---------- */
+(window.LBD_READY || Promise.resolve()).then(() => { refresh(); initBackend(); });
+</script>
+</body>
+</html>
